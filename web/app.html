@@ -1,0 +1,2352 @@
+<title>Field Ticket</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Red+Hat+Text:wght@400;600&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Identity: a ticket torn from a carbon-copy triplicate book (white, canary, pink plies, red machine serial).
+   Dark: the carbon sheet, blue-black with a pale blue impression. */
+:root {
+  --bg: #ebdf96; --surface: #fffffb; --surface-2: #f9dde3; --hair: #ddd3a2; --line: #6c6a58;
+  --fg: #1b1c2a; --muted: #474858; --accent: #2a3b8f; --accent-ink: #ffffff;
+  --mark: #c0182c; --good: #1e6331; --warn: #7a4d00; --bad: #a3141f; --field: #ffffff;
+  --chart-1: #2a3b8f; --chart-2: #c0182c; --chart-3: #1b1c2a; --chart-4: #8a6a00; --chart-grid: #e5dfc6;
+  --display: "Zilla Slab", Rockwell, "Courier New", "DejaVu Serif", serif;
+  --body: "Red Hat Text", "Segoe UI", "Helvetica Neue", Arial, "DejaVu Sans", sans-serif;
+  --mono: "Courier Prime", "Courier New", Courier, "Nimbus Mono PS", "DejaVu Sans Mono", monospace;
+  /* The document preview and signature pads are the white top ply in both themes. */
+  --paper: #fffffb; --paper-ink: #1b1c2a; --paper-muted: #474858; --paper-line: #77735e; --paper-band: #f9dde3; --paper-accent: #2a3b8f;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10131f; --surface: #171b2b; --surface-2: #1f2438; --hair: #2a3150; --line: #7781aa;
+  --fg: #e8eaf5; --muted: #aab1cf; --accent: #9fb0ff; --accent-ink: #0d1230;
+  --mark: #ff7d8a; --good: #7dd69a; --warn: #f2c060; --bad: #ffa08a; --field: #121628;
+  --chart-1: #9fb0ff; --chart-2: #ff7d8a; --chart-3: #e8eaf5; --chart-4: #f2c060; --chart-grid: #262c45;
+  --display: "Zilla Slab", Rockwell, "Courier New", "DejaVu Serif", serif;
+  --body: "Red Hat Text", "Segoe UI", "Helvetica Neue", Arial, "DejaVu Sans", sans-serif;
+  --mono: "Courier Prime", "Courier New", Courier, "Nimbus Mono PS", "DejaVu Sans Mono", monospace;
+  --paper: #fffffb; --paper-ink: #1b1c2a; --paper-muted: #474858; --paper-line: #77735e; --paper-band: #f9dde3; --paper-accent: #2a3b8f;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #10131f; --surface: #171b2b; --surface-2: #1f2438; --hair: #2a3150; --line: #7781aa;
+  --fg: #e8eaf5; --muted: #aab1cf; --accent: #9fb0ff; --accent-ink: #0d1230;
+  --mark: #ff7d8a; --good: #7dd69a; --warn: #f2c060; --bad: #ffa08a; --field: #121628;
+  --chart-1: #9fb0ff; --chart-2: #ff7d8a; --chart-3: #e8eaf5; --chart-4: #f2c060; --chart-grid: #262c45;
+  --display: "Zilla Slab", Rockwell, "Courier New", "DejaVu Serif", serif;
+  --body: "Red Hat Text", "Segoe UI", "Helvetica Neue", Arial, "DejaVu Sans", sans-serif;
+  --mono: "Courier Prime", "Courier New", Courier, "Nimbus Mono PS", "DejaVu Sans Mono", monospace;
+  --paper: #fffffb; --paper-ink: #1b1c2a; --paper-muted: #474858; --paper-line: #77735e; --paper-band: #f9dde3; --paper-accent: #2a3b8f;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+.wrap {
+  max-width: 880px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 40px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.wrap > *, main > * { min-width: 0; }
+[hidden] { display: none !important; }
+p { margin: 0; }
+
+/* Header: the ticket stub, ply edges and the perforation. */
+header.strip { display: flex; flex-direction: column; }
+.stub { background: var(--surface); border: 1px solid var(--line); padding: 10px 14px 12px; }
+.stub .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 12px; }
+.stub .co { font: 700 1.35rem/1.15 var(--display); letter-spacing: .05em; text-transform: uppercase; }
+.stub .no { font: 700 1.15rem/1.15 var(--mono); color: var(--mark); letter-spacing: .06em; white-space: nowrap; }
+.stub .meta { font: 14px/1.4 var(--mono); color: var(--muted); margin-top: 4px; }
+.plies i { display: block; height: 6px; margin: 0 5px; border: 1px solid var(--line); border-top: 0; background: var(--bg); }
+.plies i + i { margin: 0 10px; background: var(--surface-2); }
+.perf { height: 12px; margin: 6px 0 8px; background: radial-gradient(circle, var(--line) 2px, transparent 2.5px) 0 50% / 10px 10px repeat-x; }
+h1 { font: 700 2.3rem/1.05 var(--display); margin: 2px 0 6px; letter-spacing: .005em; }
+.lede { color: var(--muted); max-width: 65ch; }
+h2 { font: 700 1.45rem/1.15 var(--display); margin: 0; letter-spacing: .03em; text-transform: uppercase; }
+h3 { font: 700 1.15rem/1.2 var(--display); margin: 0; letter-spacing: .06em; text-transform: uppercase; padding-bottom: 4px; border-bottom: 1.5px solid var(--fg); }
+.hint { color: var(--muted); font-size: 16px; max-width: 65ch; }
+
+/* Device note: a carbon slip clipped to the book. Stays visible. */
+.device { background: var(--surface-2); border: 1px dashed var(--line); padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; color: var(--fg); }
+.device .store { font-family: var(--mono); font-size: 14px; color: var(--muted); }
+.device .store.warn { color: var(--warn); font-weight: 700; }
+
+main { display: flex; flex-direction: column; gap: 14px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 0; padding: 14px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row > * { min-width: 0; }
+.stack { display: flex; flex-direction: column; gap: 10px; }
+
+/* Controls: 44px tap targets, 16px text so phones do not zoom. Inputs are ruled ticket blanks. */
+input, select, textarea, button { font: inherit; color: inherit; }
+input[type="text"], input[type="date"], input[type="time"], input[type="email"], input[type="tel"], select, textarea {
+  background: var(--field); color: var(--fg); border: 1px solid var(--line); border-bottom: 2px solid var(--fg); border-radius: 0;
+  padding: 8px 10px; min-height: 44px; min-width: 0; width: 100%; font-size: 16px;
+}
+textarea { min-height: 80px; resize: vertical; }
+textarea.mono { font-family: var(--mono); font-size: 14px; min-height: 160px; }
+input.num { font-family: var(--mono); font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; color: var(--accent); }
+[aria-invalid="true"] { border-color: var(--bad) !important; }
+button {
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 0;
+  padding: 10px 16px; min-height: 48px; cursor: pointer; line-height: 1.25; font-weight: 600;
+}
+button:hover { background: var(--surface-2); }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.primary:hover { background: var(--accent); filter: brightness(1.12); }
+button.danger { color: var(--bad); border-color: var(--bad); background: transparent; }
+button.quiet { background: transparent; border-style: dashed; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+input[type="file"] { font-size: 16px; max-width: 100%; min-height: 44px; }
+.check { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
+.check input { width: 24px; height: 24px; margin: 0; accent-color: var(--accent); flex: none; }
+
+.fields { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 520px) { .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fields .wide { grid-column: 1 / -1; } }
+@media (min-width: 760px) { .fields.three { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label, .lbl { font: 600 15px/1.3 var(--display); letter-spacing: .02em; color: var(--fg); }
+.field .err { color: var(--bad); font-size: 15px; }
+.field output, .ro { font-family: var(--mono); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); min-height: 44px; display: flex; align-items: center; }
+
+/* Navigation: index tabs on the ticket book. */
+nav.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+@media (min-width: 640px) { nav.tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+nav.tabs button { font-family: var(--display); font-weight: 700; letter-spacing: .03em; text-transform: uppercase; font-size: 1rem; padding: 8px 4px; min-height: 48px; overflow-wrap: anywhere; background: var(--surface); border-bottom-width: 3px; }
+nav.tabs button[aria-current="page"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { padding: 8px 14px; font-size: 16px; font-weight: 400; }
+.seg button[aria-pressed="true"] { border: 2px solid var(--accent); color: var(--accent); font-weight: 700; background: var(--field); }
+
+.chip { display: inline-flex; align-items: center; font: 700 13px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; border: 1.5px solid var(--accent); color: var(--accent); border-radius: 0; padding: 2px 8px; white-space: nowrap; }
+.chip.good { border-color: var(--good); color: var(--good); }
+.chip.warn { border-color: var(--warn); color: var(--warn); }
+.chip.bad { border-color: var(--bad); color: var(--bad); }
+.chip.muted { border-color: var(--line); color: var(--muted); }
+
+.banner { border: 1.5px solid var(--warn); padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
+.banner b { color: var(--warn); font: 700 14px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.confirm { border: 1.5px solid var(--bad); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; background: var(--surface); }
+.msg { font-size: 16px; }
+.msg.bad { color: var(--bad); }
+.msg.good { color: var(--good); }
+
+/* Stats. The first one, Outstanding, carries the office's red rubber stamp. */
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 640px) { .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.stat { border: 1px solid var(--line); background: var(--field); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stat .k { font: 600 14px/1.3 var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.stat .v { font: 700 1.15rem/1.25 var(--mono); font-variant-numeric: tabular-nums; color: var(--accent); overflow-wrap: anywhere; }
+.stat.over .v { color: var(--bad); }
+.stats .stat:first-child { border: 2.5px solid var(--mark); border-radius: 3px; background: transparent; transform: rotate(-2deg); margin: 2px 4px; }
+.stats .stat:first-child .k { color: var(--mark); font-weight: 700; letter-spacing: .12em; }
+.stats .stat:first-child .v { color: var(--mark); font-size: 1.35rem; }
+
+/* Document list: tickets in the book. */
+ul.docs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+ul.docs li { border: 1px solid var(--line); background: var(--field); display: flex; flex-direction: column; min-width: 0; }
+button.doc-open { display: flex; flex-direction: column; gap: 4px; text-align: left; border: 0; border-radius: 0; background: transparent; padding: 12px; width: 100%; min-height: 56px; font-weight: 400; }
+button.doc-open:hover { background: var(--surface-2); }
+.doc-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.doc-num { font-family: var(--mono); font-weight: 700; color: var(--accent); letter-spacing: .04em; }
+.doc-type { font-size: 15px; color: var(--muted); }
+.doc-cust { font-weight: 600; overflow-wrap: anywhere; }
+.doc-money { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 15px; color: var(--muted); }
+.doc-money .n { font-family: var(--mono); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--fg); }
+ul.docs .pick { border-top: 1px dashed var(--line); padding: 0 12px; }
+
+/* Line items and day rows as cards: they read on a 360px phone. Each sits on the pink copy. */
+.items, .days, .pays { display: flex; flex-direction: column; gap: 10px; }
+.item, .day, .pay, .rec { border: 1px solid var(--line); padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; background: var(--surface-2); }
+.item-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.item-head .lbl { font-family: var(--mono); font-weight: 700; }
+.grid4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 560px) { .grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.amt { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--accent); }
+
+/* Totals */
+table { border-collapse: collapse; width: 100%; font-size: 16px; }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--hair); text-align: left; }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.strong td { font-weight: 700; }
+.scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* Editor totals: label and figure on one line; the last heavy row (Total, or Balance due on an invoice) gets the stamp. */
+#totals table, #totals tbody { display: block; }
+#totals tr { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--hair); }
+#totals td { border: 0; padding: 6px 4px; }
+#totals td.n { font-weight: 700; color: var(--accent); }
+#totals tr.strong { border-bottom: 1.5px solid var(--fg); }
+#totals tr.strong:not(:has(~ tr.strong)) { width: fit-content; max-width: 100%; margin: 12px 6px 6px auto; padding: 2px 10px; border: 2.5px solid var(--mark); border-radius: 3px; transform: rotate(-2deg); color: var(--mark); }
+#totals tr.strong:not(:has(~ tr.strong)) td { font: 700 15px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--mark); }
+#totals tr.strong:not(:has(~ tr.strong)) td.n { font: 700 1.5rem var(--mono); letter-spacing: 0; text-transform: none; }
+
+/* Signature pads: paper colored so the ink matches the PDF. */
+.sigs { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 640px) { .sigs { grid-template-columns: 1fr 1fr; } }
+canvas.sig { display: block; width: 100%; height: auto; aspect-ratio: 600 / 180; background: var(--paper); border: 1.5px dashed var(--line); touch-action: none; cursor: crosshair; }
+
+/* Preview: the white top ply in both themes, typed through carbon. */
+.paper { background: var(--paper); color: var(--paper-ink); border: 1px solid var(--line); border-top: 4px solid var(--paper-accent); padding: 18px 16px; font-size: 13px; line-height: 1.4; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.paper .p-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+.paper .p-biz { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.paper .p-biz img { max-width: 150px; max-height: 60px; object-fit: contain; align-self: flex-start; margin-bottom: 4px; }
+.paper .p-name { font-weight: 600; font-size: 15px; }
+.paper .p-sub { color: var(--paper-muted); white-space: pre-line; overflow-wrap: anywhere; }
+.paper .p-title { font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: .04em; text-transform: uppercase; color: var(--paper-accent); text-align: right; line-height: 1; }
+.paper .p-meta { display: grid; grid-template-columns: auto auto; gap: 1px 12px; justify-content: end; font-family: var(--mono); font-size: 12.5px; }
+.paper .p-meta span:nth-child(odd) { color: var(--paper-muted); text-align: right; }
+.paper .p-label { font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--paper-muted); }
+.paper .p-kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 4px 14px; }
+.paper .p-kv div { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.paper table { font-size: 12.5px; min-width: 520px; }
+.paper th { background: var(--paper-band); color: var(--paper-muted); font-family: var(--display); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; border-bottom: 1.5px solid var(--paper-ink); }
+.paper td { border-bottom-color: var(--paper-line); border-bottom-style: dotted; vertical-align: top; }
+.paper td.n { font-family: var(--mono); }
+.paper td.desc { overflow-wrap: anywhere; min-width: 160px; }
+.paper .p-totals { margin-left: auto; min-width: 0; width: 100%; max-width: 320px; }
+.paper .p-totals table { min-width: 0; }
+.paper .p-sigs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.paper .p-sig { border-bottom: 1px solid var(--paper-ink); min-height: 70px; display: flex; align-items: flex-end; }
+.paper .p-sig img { max-height: 70px; max-width: 100%; }
+.paper .p-note { white-space: pre-line; overflow-wrap: anywhere; }
+
+footer { display: flex; flex-direction: column; gap: 6px; color: var(--muted); font-size: 16px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.maker { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+details { background: var(--surface); border: 1px solid var(--line); padding: 0 14px; color: var(--fg); margin-top: 8px; }
+summary { cursor: pointer; font: 700 1.15rem/1.2 var(--display); text-transform: uppercase; letter-spacing: .05em; padding: 12px 0; min-height: 48px; }
+details[open] { padding-bottom: 12px; }
+details[open] summary { border-bottom: 1.5px solid var(--fg); margin-bottom: 8px; }
+.method { display: flex; flex-direction: column; gap: 8px; max-width: 74ch; font-size: 16px; }
+.method ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+code { font-family: var(--mono); font-size: 15px; overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header class="strip">
+    <div class="stub">
+      <div class="top"><span class="co">Field Tools</span><span class="no">No. 07</span></div>
+      <p class="meta">Estimate &middot; Field ticket &middot; Invoice &middot; USD</p>
+    </div>
+    <div class="plies" aria-hidden="true"><i></i><i></i></div>
+    <div class="perf" aria-hidden="true"></div>
+    <h1>Field Ticket</h1>
+    <p class="lede">Estimates, oilfield field tickets, and invoices for contractors and service crews. Turn one into the next and make a print-ready PDF.</p>
+  </header>
+
+  <div class="device" id="device-note">
+    <p>Your data lives only in this browser on this device. Nothing is uploaded and there is no account. To keep a copy or move to another phone or computer, use Backup, then Export all.</p>
+    <p class="store" id="store-status">Not saved yet. Changes save on this device as you type.</p>
+  </div>
+
+  <section class="banner" id="example-banner" hidden aria-label="Example data">
+    <p><b>Example data</b></p>
+    <p>A sample business (Example Co.), two sample customers, a catalog, one sample invoice, and one sample oilfield field ticket are loaded so you can see how it works. Everything in it is made up.</p>
+    <div class="row"><button type="button" id="btn-start-fresh">Start fresh</button></div>
+    <div class="confirm" id="fresh-confirm" hidden>
+      <p id="fresh-confirm-text">Remove the example business, customers, catalog items, and sample documents? Anything you added yourself stays.</p>
+      <div class="row">
+        <button type="button" class="danger" id="btn-fresh-yes">Remove examples</button>
+        <button type="button" id="btn-fresh-no">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <nav class="tabs" id="nav" aria-label="Sections">
+    <button type="button" id="nav-docs" data-view="docs">Documents</button>
+    <button type="button" id="nav-business" data-view="business">Business</button>
+    <button type="button" id="nav-customers" data-view="customers">Customers</button>
+    <button type="button" id="nav-catalog" data-view="catalog">Catalog</button>
+    <button type="button" id="nav-backup" data-view="backup">Backup</button>
+  </nav>
+
+  <main id="view" aria-live="polite"></main>
+
+  <footer>
+    <p>Built by Will Whitmire. Runs entirely in your browser; nothing you enter is uploaded.</p>
+    <p class="maker">W. Whitmire / Field Tools / No. 07</p>
+    <details id="method">
+      <summary>Method and limits</summary>
+      <div class="method">
+        <p><b>Money.</b> Every amount is stored and added as a whole number of cents. Quantities carry up to 3 decimals, discounts up to 2, and the tax rate up to 3. They are turned into whole numbers before any math, so no rounding error builds up.</p>
+        <p><b>Rounding.</b> Each division that lands on cents rounds to the nearest cent, and an exact half cent rounds away from zero (0.5 cent becomes 1 cent).</p>
+        <p><b>Line.</b> <code>amount = round(qty x rate)</code>, then <code>line discount = round(amount x disc% / 100)</code> and <code>net = amount - line discount</code>.</p>
+        <p><b>Document.</b> <code>subtotal = sum of line nets</code>. A percent discount is <code>round(subtotal x pct / 100)</code>; a dollar discount is capped at the subtotal. The document discount is spread over the lines in proportion to their nets (largest remainder, ties to the earlier line), so each taxable line is taxed on its share after discount.</p>
+        <p><b>Tax.</b> Per document: <code>tax = round(sum of taxable bases x rate / 100)</code>, rounded once. Per line: <code>tax = sum of round(base x rate / 100)</code>, rounded on every line. The two can differ by a few cents; pick the one your state or customer expects.</p>
+        <p><b>Total and balance.</b> <code>total = subtotal - discount + tax + shipping</code>. <code>balance = total - deposit - payments</code>. A negative balance is a credit.</p>
+        <p><b>Due date.</b> Issue date plus 0 (Due on receipt), 15, 30, or 60 calendar days, on the Gregorian calendar with leap years. An invoice marked Sent is overdue from the day after its due date. It is Paid when marked Paid or when deposit and payments cover the total.</p>
+        <p><b>Hours.</b> Each day row is end minus start on a 24 hour clock. An end at or before the start means the shift ran past midnight, so 24 hours are added; equal times count as a full 24 hour day. No overtime split. Hours show with 2 decimals; a labor line made from them uses 3 decimals (20 minutes is 0.333 h).</p>
+        <p><b>Limits.</b></p>
+        <ul>
+          <li>Not tax or legal advice. One tax rate per document. No compound or multi-jurisdiction tax, no tax on shipping, no withholding.</li>
+          <li>US dollars only. Any one amount and any one line is capped at $10,000,000.00.</li>
+          <li>Data is stored in this browser's local storage. Clearing site data, private windows, or some phone storage cleanups erase it. Export a backup often.</li>
+          <li>The PDF uses the built-in Helvetica font, which covers Western European letters only. Other characters print as a question mark.</li>
+          <li>The PDF is built on your device by jsPDF, an MIT licensed library loaded once from cdnjs with an integrity hash. No document data is sent anywhere.</li>
+          <li>A drawn signature is a picture of a signature, not a verified electronic signature.</li>
+        </ul>
+      </div>
+    </details>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js" integrity="sha384-qovJwSBbRDPP5cEjCp8S0UP66wrvnjaa60XMOGzTNanrThcrGfXfnZkvgY8N1KT3" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+
+<script id="core">
+// Pure Field Ticket math. No DOM access. Mirrors src/field_ticket (core.py, schema.py, example.py).
+// Money is integer cents. Products that can pass 2^53 use BigInt, so every result is exact.
+var FT = (function () {
+  "use strict";
+  var MAX_CENTS = 1000000000;
+  var MAX_QTY = 1000000;
+  var MAX_ITEMS = 500;
+  var TERMS = { receipt: 0, net15: 15, net30: 30, net60: 60 };
+  var TERMS_KEYS = ["receipt", "net15", "net30", "net60"];
+  var TERMS_LABEL = { receipt: "Due on receipt", net15: "Net 15", net30: "Net 30", net60: "Net 60" };
+  var TYPE_LABEL = { estimate: "Estimate", ticket: "Field Ticket", invoice: "Invoice" };
+  var STATUS_KEYS = ["draft", "sent", "paid"];
+
+  function FieldTicketError(code, message) {
+    var e = new Error(message);
+    e.name = "FieldTicketError";
+    e.code = code;
+    return e;
+  }
+  function has(o, k) { return o !== null && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, k); }
+  // dict.get(k, def): the default only when the key is absent.
+  function get(o, k, def) { return has(o, k) ? o[k] : def; }
+  // dict.get(k): absent and null both read as null.
+  function opt(o, k) { var v = get(o, k, null); return v === undefined ? null : v; }
+  function isObj(v) { return v !== null && typeof v === "object" && !Array.isArray(v); }
+  function clone(x) { return JSON.parse(JSON.stringify(x)); }
+
+  // ------------------------------------------------------------ rounding
+  function divRoundBig(n, d) {
+    n = BigInt(n); d = BigInt(d);
+    if (d <= 0n) throw FieldTicketError("bad_divisor", "Divisor must be positive.");
+    var a = n < 0n ? -n : n;
+    var q = (a * 2n + d) / (2n * d);
+    return n >= 0n ? q : -q;
+  }
+  function divRound(n, d) { return Number(divRoundBig(n, d)); }
+
+  function isNumber(x) { return typeof x === "number" && isFinite(x); }
+
+  function scaled(x, places, lo, hi, name) {
+    var msg = name + ": must be a number from " + String(lo) + " to " + String(hi) + " with at most " + places + " decimals.";
+    if (!isNumber(x) || x < lo || x > hi) throw FieldTicketError("bad_field", msg);
+    var v = x * Math.pow(10, places);
+    var r = v >= 0 ? Math.floor(v + 0.5) : -Math.floor(-v + 0.5);
+    if (Math.abs(v - r) > 1e-4) throw FieldTicketError("bad_field", msg);
+    return r;
+  }
+
+  function cents(x, name, lo, hi) {
+    if (lo === undefined) lo = 0;
+    if (hi === undefined) hi = MAX_CENTS;
+    var msg = name + ": must be a whole number of cents from " + String(lo) + " to " + String(hi) + ".";
+    if (!isNumber(x) || !Number.isInteger(x) || x < lo || x > hi) throw FieldTicketError("bad_field", msg);
+    return x;
+  }
+
+  // ------------------------------------------------------------ totals
+  function lineTotals(item, path) {
+    if (path === undefined) path = "item";
+    if (!isObj(item)) throw FieldTicketError("bad_field", path + ": must be an object.");
+    var qm = scaled(opt(item, "qty"), 3, 0, MAX_QTY, path + ".qty");
+    var rate = cents(opt(item, "rate_cents"), path + ".rate_cents");
+    var dp = scaled(get(item, "discount_pct", 0), 2, 0, 100, path + ".discount_pct");
+    var gross = divRound(BigInt(qm) * BigInt(rate), 1000);
+    if (gross > MAX_CENTS) throw FieldTicketError("bad_field", path + ": line amount is over $10,000,000.00. Split it into smaller lines.");
+    var ldisc = divRound(BigInt(gross) * BigInt(dp), 10000);
+    return { gross: gross, line_discount: ldisc, net: gross - ldisc };
+  }
+
+  function allocate(amount, weights) {
+    var total = 0n, i;
+    for (i = 0; i < weights.length; i++) total += BigInt(weights[i]);
+    var out = weights.map(function () { return 0; });
+    if (total <= 0n || amount === 0) return out;
+    var A = BigInt(amount), base = [], rem = [], sum = 0n;
+    for (i = 0; i < weights.length; i++) {
+      var p = A * BigInt(weights[i]);
+      base.push(p / total); rem.push(p % total); sum += p / total;
+    }
+    var left = Number(A - sum);
+    var order = weights.map(function (_, k) { return k; });
+    order.sort(function (a, b) { return rem[a] > rem[b] ? -1 : rem[a] < rem[b] ? 1 : a - b; });
+    for (i = 0; i < left; i++) base[order[i]] += 1n;
+    return base.map(Number);
+  }
+
+  function computeTotals(doc) {
+    var items = opt(doc, "items");
+    if (items === null) items = [];
+    if (!Array.isArray(items) || items.length > MAX_ITEMS) {
+      throw FieldTicketError("bad_field", "items: must be a list of at most " + MAX_ITEMS + " entries.");
+    }
+    var lines = items.map(function (it, i) { return lineTotals(it, "items[" + i + "]"); });
+    var subtotal = 0;
+    lines.forEach(function (ln) { subtotal += ln.net; });
+
+    var kind = get(doc, "discount_kind", "pct");
+    var val = get(doc, "discount_value", 0);
+    var discount;
+    if (kind === "pct") {
+      var dp = scaled(val, 2, 0, 100, "discount_value");
+      discount = divRound(BigInt(subtotal) * BigInt(dp), 10000);
+    } else if (kind === "amt") {
+      discount = Math.min(cents(val, "discount_value"), subtotal);
+    } else {
+      throw FieldTicketError("bad_field", "discount_kind: must be one of pct, amt.");
+    }
+
+    var alloc = allocate(discount, lines.map(function (ln) { return ln.net; }));
+    var rateM = scaled(get(doc, "tax_rate_pct", 0), 3, 0, 100, "tax_rate_pct");
+    var mode = get(doc, "tax_mode", "document");
+    if (mode !== "document" && mode !== "line") throw FieldTicketError("bad_field", "tax_mode: must be one of document, line.");
+
+    var outLines = [], taxableBase = 0, tax = 0;
+    lines.forEach(function (ln, i) {
+      var base = opt(items[i], "taxable") === true ? ln.net - alloc[i] : 0;
+      taxableBase += base;
+      var t = mode === "line" ? divRound(BigInt(base) * BigInt(rateM), 100000) : null;
+      if (t !== null) tax += t;
+      outLines.push({ gross: ln.gross, line_discount: ln.line_discount, net: ln.net, discount_alloc: alloc[i], tax_base: base, tax: t });
+    });
+    if (mode === "document") tax = divRound(BigInt(taxableBase) * BigInt(rateM), 100000);
+
+    var shipping = cents(get(doc, "shipping_cents", 0), "shipping_cents");
+    var deposit = cents(get(doc, "deposit_cents", 0), "deposit_cents");
+    var pays = opt(doc, "payments");
+    if (pays === null) pays = [];
+    if (!Array.isArray(pays)) throw FieldTicketError("bad_field", "payments: must be a list.");
+    var payments = 0;
+    pays.forEach(function (p, i) {
+      if (!isObj(p)) throw FieldTicketError("bad_field", "payments[" + i + "]: must be an object.");
+      payments += cents(opt(p, "amount_cents"), "payments[" + i + "].amount_cents");
+    });
+    var total = subtotal - discount + tax + shipping;
+    var paid = deposit + payments;
+    return {
+      lines: outLines, subtotal: subtotal, discount: discount, taxable_base: taxableBase, tax: tax,
+      shipping: shipping, total: total, deposit: deposit, payments: payments, paid: paid, balance: total - paid
+    };
+  }
+
+  // ------------------------------------------------------------ dates
+  var DATE_RE = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/;
+  function isLeap(y) { return y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0); }
+  function daysInMonth(y, m) { return [31, isLeap(y) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1]; }
+  function parseDate(s, name) {
+    if (name === undefined) name = "date";
+    var m = typeof s === "string" ? DATE_RE.exec(s) : null;
+    if (m) {
+      var y = +m[1], mo = +m[2], d = +m[3];
+      if (y >= 1900 && y <= 2999 && mo >= 1 && mo <= 12 && d >= 1 && d <= daysInMonth(y, mo)) return [y, mo, d];
+    }
+    throw FieldTicketError("bad_field", name + ": must be a date written YYYY-MM-DD.");
+  }
+  function fdiv(a, b) { return Math.floor(a / b); }
+  // Days since 1970-01-01, proleptic Gregorian (H. Hinnant, chrono-compatible date algorithms).
+  function daysFromCivil(y, m, d) {
+    y -= m <= 2 ? 1 : 0;
+    var era = fdiv(y, 400);
+    var yoe = y - era * 400;
+    var doy = fdiv(153 * (m + (m > 2 ? -3 : 9)) + 2, 5) + d - 1;
+    var doe = yoe * 365 + fdiv(yoe, 4) - fdiv(yoe, 100) + doy;
+    return era * 146097 + doe - 719468;
+  }
+  function civilFromDays(z) {
+    z += 719468;
+    var era = fdiv(z, 146097);
+    var doe = z - era * 146097;
+    var yoe = fdiv(doe - fdiv(doe, 1460) + fdiv(doe, 36524) - fdiv(doe, 146096), 365);
+    var y = yoe + era * 400;
+    var doy = doe - (365 * yoe + fdiv(yoe, 4) - fdiv(yoe, 100));
+    var mp = fdiv(5 * doy + 2, 153);
+    var d = doy - fdiv(153 * mp + 2, 5) + 1;
+    var m = mp + (mp < 10 ? 3 : -9);
+    return [y + (m <= 2 ? 1 : 0), m, d];
+  }
+  function pad(n, w) { var s = String(n); while (s.length < w) s = "0" + s; return s; }
+  function addDays(s, n) {
+    var p = parseDate(s);
+    var c = civilFromDays(daysFromCivil(p[0], p[1], p[2]) + n);
+    return pad(c[0], 4) + "-" + pad(c[1], 2) + "-" + pad(c[2], 2);
+  }
+  function dueDate(issue, terms) {
+    if (typeof terms !== "string" || !has(TERMS, terms)) throw FieldTicketError("bad_field", "terms: must be one of " + TERMS_KEYS.join(", ") + ".");
+    return addDays(issue, TERMS[terms]);
+  }
+  function daysBetween(a, b) {
+    var pb = parseDate(b), pa = parseDate(a);
+    return daysFromCivil(pb[0], pb[1], pb[2]) - daysFromCivil(pa[0], pa[1], pa[2]);
+  }
+
+  // ------------------------------------------------------------ hours
+  var TIME_RE = /^([0-9]{2}):([0-9]{2})$/;
+  function parseTime(s, name, allow24) {
+    var m = typeof s === "string" ? TIME_RE.exec(s) : null;
+    if (m) {
+      var h = +m[1], mi = +m[2];
+      if ((h <= 23 && mi <= 59) || (allow24 && h === 24 && mi === 0)) return h * 60 + mi;
+    }
+    throw FieldTicketError("bad_field", (name || "time") + ": must be a time written HH:MM, or blank.");
+  }
+  // End at or before start means the shift ran past midnight. Equal times are a full 24 h day.
+  function shiftMinutes(start, end) {
+    var s = parseTime(start, "start", false);
+    var e = parseTime(end, "end", true);
+    if (e <= s) e += 1440;
+    return e - s;
+  }
+  function ticketMinutes(days) {
+    var per = [], total = 0;
+    if (days === null || days === undefined) days = [];
+    days.forEach(function (d, i) {
+      if (!isObj(d)) throw FieldTicketError("bad_field", "days[" + i + "]: must be an object.");
+      var st = get(d, "start", ""), en = get(d, "end", "");
+      if (!st || !en) { per.push(null); return; }
+      var m;
+      try { m = shiftMinutes(st, en); } catch (e) {
+        if (e.code) throw FieldTicketError("bad_field", "days[" + i + "]." + e.message);
+        throw e;
+      }
+      per.push(m); total += m;
+    });
+    return { days: per, total: total };
+  }
+  function hoursQty(minutes) { return divRound(minutes * 1000, 60); }
+  function formatHours(minutes) {
+    var c = divRound(minutes * 100, 60);
+    var sign = c < 0 ? "-" : "";
+    c = Math.abs(c);
+    return sign + Math.floor(c / 100) + "." + pad(c % 100, 2);
+  }
+
+  // ------------------------------------------------------------ formatting
+  function group(n) {
+    var s = String(n), out = "";
+    while (s.length > 3) { out = "," + s.slice(-3) + out; s = s.slice(0, -3); }
+    return s + out;
+  }
+  function formatMoney(c) {
+    var sign = c < 0 ? "-" : "";
+    c = Math.abs(c);
+    return sign + "$" + group(Math.floor(c / 100)) + "." + pad(c % 100, 2);
+  }
+  function centsPlain(c) {
+    var sign = c < 0 ? "-" : "";
+    c = Math.abs(c);
+    return sign + Math.floor(c / 100) + "." + pad(c % 100, 2);
+  }
+  function formatDocNumber(prefix, n) { return prefix + pad(n, 4); }
+  // Scaled integer to plain decimal text with no trailing zeros, for input boxes.
+  function scaledText(v, places) {
+    var p = Math.pow(10, places), w = Math.floor(v / p), f = pad(v % p, places).replace(/0+$/, "");
+    return f ? w + "." + f : String(w);
+  }
+
+  // ------------------------------------------------------------ status
+  function docStatus(doc, today) {
+    if (doc.type !== "invoice") return get(doc, "converted_to", "") ? "converted" : get(doc, "status", "draft");
+    var t = computeTotals(doc);
+    var settled = t.balance <= 0 && (t.total > 0 || get(doc, "status", null) !== "draft");
+    if (get(doc, "status", null) === "paid" || settled) return "paid";
+    if (get(doc, "status", null) === "draft") return "draft";
+    if (today > dueDate(doc.issue_date, get(doc, "terms", "net30"))) return "overdue";
+    return "sent";
+  }
+  function summarize(docs, today) {
+    var counts = { draft: 0, sent: 0, paid: 0, overdue: 0, converted: 0 }, outstanding = 0, overdue = 0;
+    docs.forEach(function (d) {
+      var st = docStatus(d, today);
+      counts[st] += 1;
+      if (d.type === "invoice" && (st === "sent" || st === "overdue")) {
+        var bal = computeTotals(d).balance;
+        outstanding += bal;
+        if (st === "overdue") overdue += bal;
+      }
+    });
+    return { counts: counts, outstanding: outstanding, overdue: overdue };
+  }
+
+  // ------------------------------------------------------------ conversions
+  function blankSigs(oil) { var o = clone(oil); o.sig_company = ""; o.sig_crew = ""; return o; }
+
+  function estimateToInvoice(est, newId, number, issueDate) {
+    if (get(est, "type", null) !== "estimate") throw FieldTicketError("bad_source", "Only an estimate can be converted with this action.");
+    if (get(est, "converted_to", "")) throw FieldTicketError("already_converted", est.number + " was already converted to " + est.converted_to + ".");
+    parseDate(issueDate, "issue_date");
+    var inv = clone(est);
+    inv.id = newId; inv.type = "invoice"; inv.number = number; inv.status = "draft"; inv.issue_date = issueDate;
+    inv.payments = []; inv.sources = [est.number]; inv.converted_to = "";
+    inv.oil = blankSigs(est.oil);
+    return inv;
+  }
+
+  var ASCII_UPPER = /[A-Z]/g;
+  function customerKey(name) {
+    return name.replace(/[ \t\n]+/g, " ").replace(/^ +| +$/g, "")
+      .replace(ASCII_UPPER, function (c) { return String.fromCharCode(c.charCodeAt(0) + 32); });
+  }
+
+  var NOTES_MAX = 2000; // same cap as sDoc notes
+  // Refuse a bundle whose invoice the backup schema would reject (it would make the saved state unloadable).
+  function checkBundleFits(tickets) {
+    var nDays = 0, nPay = 0, ship = 0, dep = 0, notes = [];
+    tickets.forEach(function (t) {
+      nDays += t.oil.days.length; nPay += t.payments.length; ship += t.shipping_cents; dep += t.deposit_cents;
+      var n = get(t, "notes", ""); if (n && notes.indexOf(n) < 0) notes.push(n);
+    });
+    if (nDays > MAX_DAYS) throw FieldTicketError("too_many_days", "The bundle has " + nDays + " day rows; an invoice holds at most " + MAX_DAYS + ". Bundle fewer tickets.");
+    if (nPay > MAX_PAYMENTS) throw FieldTicketError("too_many_payments", "The bundle has " + nPay + " payments; an invoice holds at most " + MAX_PAYMENTS + ". Bundle fewer tickets.");
+    if (tickets.length > MAX_SOURCES) throw FieldTicketError("too_many_tickets", "An invoice can list at most " + MAX_SOURCES + " source tickets.");
+    if (notes.join("\n").length > NOTES_MAX) throw FieldTicketError("notes_too_long", "The tickets' notes together are over " + NOTES_MAX + " characters. Shorten them, then bundle.");
+    if (ship > MAX_CENTS) throw FieldTicketError("amount_too_large", "The combined shipping total is over $10,000,000.00. Bundle fewer tickets.");
+    if (dep > MAX_CENTS) throw FieldTicketError("amount_too_large", "The combined deposits total is over $10,000,000.00. Bundle fewer tickets.");
+    var mixed = !tickets.every(function (t) { return t.discount_kind === "pct" && t.discount_value === tickets[0].discount_value; });
+    if (mixed) {
+      var ds = 0;
+      tickets.forEach(function (t) { ds += computeTotals(t).discount; });
+      if (ds > MAX_CENTS) throw FieldTicketError("amount_too_large", "The combined discounts are over $10,000,000.00. Bundle fewer tickets.");
+    }
+  }
+
+  function ticketsToInvoice(tickets, newId, number, issueDate) {
+    if (!tickets.length) throw FieldTicketError("no_tickets", "Pick at least one field ticket.");
+    tickets.forEach(function (t) {
+      if (get(t, "type", null) !== "ticket") throw FieldTicketError("bad_source", get(t, "number", "?") + " is not a field ticket.");
+      if (get(t, "converted_to", "")) throw FieldTicketError("already_converted", t.number + " was already invoiced on " + t.converted_to + ".");
+    });
+    var first = tickets[0];
+    var key = customerKey(first.customer.name);
+    tickets.slice(1).forEach(function (t) {
+      if (customerKey(t.customer.name) !== key) throw FieldTicketError("mixed_customers", "These tickets are for different customers. Bundle one customer at a time.");
+      if (t.tax_rate_pct !== first.tax_rate_pct || t.tax_mode !== first.tax_mode) throw FieldTicketError("mixed_tax", "These tickets use different tax settings. Make them match, then bundle.");
+    });
+    var items = [];
+    tickets.forEach(function (t) { t.items.forEach(function (it) { items.push(clone(it)); }); });
+    if (items.length > MAX_ITEMS) throw FieldTicketError("too_many_items", "The bundle has " + items.length + " line items; the limit is " + MAX_ITEMS + ".");
+    parseDate(issueDate, "issue_date");
+    checkBundleFits(tickets);
+    var dkind, dval;
+    if (tickets.every(function (t) { return t.discount_kind === "pct" && t.discount_value === first.discount_value; })) {
+      dkind = "pct"; dval = first.discount_value;
+    } else {
+      dkind = "amt"; dval = 0;
+      tickets.forEach(function (t) { dval += computeTotals(t).discount; });
+    }
+    var notes = [];
+    tickets.forEach(function (t) { var n = get(t, "notes", ""); if (n && notes.indexOf(n) < 0) notes.push(n); });
+    var oil = blankSigs(first.oil);
+    oil.enabled = tickets.some(function (t) { return t.oil.enabled; });
+    oil.days = [];
+    tickets.forEach(function (t) { t.oil.days.forEach(function (d) { oil.days.push(clone(d)); }); });
+    var inv = clone(first);
+    var sum = function (k) { var s = 0; tickets.forEach(function (t) { s += t[k]; }); return s; };
+    var pays = [];
+    tickets.forEach(function (t) { t.payments.forEach(function (p) { pays.push(clone(p)); }); });
+    inv.id = newId; inv.type = "invoice"; inv.number = number; inv.status = "draft"; inv.issue_date = issueDate;
+    inv.items = items; inv.discount_kind = dkind; inv.discount_value = dval;
+    inv.shipping_cents = sum("shipping_cents"); inv.deposit_cents = sum("deposit_cents"); inv.payments = pays;
+    inv.notes = notes.join("\n"); inv.sources = tickets.map(function (t) { return t.number; }); inv.converted_to = "";
+    inv.oil = oil;
+    return inv;
+  }
+
+  // ------------------------------------------------------------ text input
+  var DEC_RE = /^([0-9]*)(?:\.([0-9]*))?$/;
+  function parseDecimal(s, places, name, hi) {
+    if (typeof s !== "string") throw FieldTicketError("bad_field", name + ": must be text.");
+    var t = s.split(" ").join("").split(",").join("");
+    if (t === "") return 0;
+    if (t.charAt(0) === "$") t = t.slice(1);
+    var m = DEC_RE.exec(t);
+    if (!m || (m[1] === "" && !m[2])) throw FieldTicketError("bad_field", name + ": enter a number such as 12 or 12.50.");
+    var frac = m[2] || "";
+    if (frac.length > places) throw FieldTicketError("bad_field", name + ": use at most " + places + " decimals.");
+    var whole = m[1].replace(/^0+/, "") || "0";
+    if (whole.length > 12) throw FieldTicketError("bad_field", name + ": is too large.");
+    var fpad = (frac + "0000000000").slice(0, places);
+    var v = Number(whole) * Math.pow(10, places) + Number(fpad || "0");
+    if (v > hi) throw FieldTicketError("bad_field", name + ": is too large.");
+    return v;
+  }
+  function parseMoney(s, name) { return parseDecimal(s, 2, name || "amount", MAX_CENTS); }
+
+  // ------------------------------------------------------------ CSV list export
+  function csvCell(text) {
+    if (text.length && "=+-@\t\r".indexOf(text.charAt(0)) >= 0) text = "'" + text;
+    if (/[,"\n\r]/.test(text)) text = '"' + text.replace(/"/g, '""') + '"';
+    return text;
+  }
+  function docsCsv(docs, today) {
+    var rows = ["Number,Type,Status,Date,Due,Customer,Total,Balance"];
+    docs.forEach(function (d) {
+      var t = computeTotals(d);
+      var due = d.type === "invoice" ? dueDate(d.issue_date, get(d, "terms", "net30")) : "";
+      rows.push([csvCell(d.number), TYPE_LABEL[d.type], docStatus(d, today), d.issue_date, due,
+        csvCell(d.customer.name), centsPlain(t.total), centsPlain(t.balance)].join(","));
+    });
+    return rows.join("\n") + "\n";
+  }
+
+  // ------------------------------------------------------------ backup schema
+  var SCHEMA_VERSION = 1, MAX_DOCS = 5000, MAX_CUSTOMERS = 2000, MAX_CATALOG = 2000, MAX_PAYMENTS = 100,
+    MAX_DAYS = 62, MAX_SOURCES = 100, LOGO_MAX_CHARS = 1000000, SIG_MAX_CHARS = 300000;
+  var ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+  var DATAURL_RE = /^data:image\/(png|jpeg);base64,[A-Za-z0-9+\/]+={0,2}$/;
+  var CTRL_RE = /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g;
+
+  function bad(path, what) { throw FieldTicketError("bad_import", path + ": " + what); }
+  function sStr(v, path, maxlen, multiline, def) {
+    if (v === null || v === undefined) return def === undefined ? "" : def;
+    if (typeof v !== "string") bad(path, "must be text.");
+    v = v.replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(CTRL_RE, "");
+    if (!multiline) v = v.replace(/[\n\t]/g, " ");
+    if (v.length > maxlen) bad(path, "is longer than " + maxlen + " characters.");
+    return v;
+  }
+  function sBool(v, path) {
+    if (v === null || v === undefined) return false;
+    if (typeof v !== "boolean") bad(path, "must be true or false.");
+    return v;
+  }
+  function sEnum(v, path, values, def) {
+    if (v === null || v === undefined) return def;
+    if (typeof v !== "string" || values.indexOf(v) < 0) bad(path, "must be one of " + values.join(", ") + ".");
+    return v;
+  }
+  function sNum(v, path, places, lo, hi) {
+    if (v === null || v === undefined) return 0;
+    scaled(v, places, lo, hi, path);
+    return v;
+  }
+  function sCents(v, path) {
+    if (v === null || v === undefined) return 0;
+    return cents(v, path);
+  }
+  function sInt(v, path, lo, hi, def) {
+    if (v === null || v === undefined) return def;
+    if (!isNumber(v) || !Number.isInteger(v) || v < lo || v > hi) bad(path, "must be a whole number from " + lo + " to " + hi + ".");
+    return v;
+  }
+  function sDate(v, path, optional) {
+    if ((v === null || v === undefined || v === "") && optional) return "";
+    if (v === null || v === undefined) bad(path, "is missing.");
+    parseDate(v, path);
+    return v;
+  }
+  function sTime(v, path, allow24) {
+    if (v === null || v === undefined || v === "") return "";
+    parseTime(v, path, allow24);
+    return v;
+  }
+  function sDataUrl(v, path, maxlen) {
+    if (v === null || v === undefined || v === "") return "";
+    if (typeof v !== "string" || !DATAURL_RE.test(v)) bad(path, "must be a PNG or JPEG image data URL.");
+    if (v.length > maxlen) bad(path, "image is too large.");
+    return v;
+  }
+  function sId(v, path) {
+    if (typeof v !== "string" || !ID_RE.test(v)) bad(path, "must be an id of 1 to 40 letters, digits, dash, or underscore.");
+    return v;
+  }
+  function sList(v, path, maxn) {
+    if (v === null || v === undefined) return [];
+    if (!Array.isArray(v)) bad(path, "must be a list.");
+    if (v.length > maxn) bad(path, "has more than " + maxn + " entries.");
+    return v;
+  }
+  function sObj(v, path) {
+    if (v === null || v === undefined) return {};
+    if (!isObj(v)) bad(path, "must be an object.");
+    return v;
+  }
+  function mapList(v, path, maxn, fn) {
+    return sList(v, path, maxn).map(function (x, i) { return fn(x, path + "[" + i + "]"); });
+  }
+  var TAX_MODES = ["document", "line"], DISC_KINDS = ["pct", "amt"], DOC_TYPES = ["estimate", "ticket", "invoice"];
+
+  function sBusiness(b, p) {
+    b = sObj(b, p);
+    return {
+      name: sStr(opt(b, "name"), p + ".name", 120),
+      address: sStr(opt(b, "address"), p + ".address", 400, true),
+      phone: sStr(opt(b, "phone"), p + ".phone", 60),
+      email: sStr(opt(b, "email"), p + ".email", 120),
+      tax_id: sStr(opt(b, "tax_id"), p + ".tax_id", 80),
+      logo: sDataUrl(opt(b, "logo"), p + ".logo", LOGO_MAX_CHARS),
+      tax_rate_pct: sNum(opt(b, "tax_rate_pct"), p + ".tax_rate_pct", 3, 0, 100),
+      tax_mode: sEnum(opt(b, "tax_mode"), p + ".tax_mode", TAX_MODES, "document"),
+      terms: sEnum(opt(b, "terms"), p + ".terms", TERMS_KEYS, "net30"),
+      payment_instructions: sStr(opt(b, "payment_instructions"), p + ".payment_instructions", 1000, true)
+    };
+  }
+  function sParty(c, p) {
+    c = sObj(c, p);
+    return {
+      name: sStr(opt(c, "name"), p + ".name", 120),
+      contact: sStr(opt(c, "contact"), p + ".contact", 120),
+      address: sStr(opt(c, "address"), p + ".address", 400, true),
+      phone: sStr(opt(c, "phone"), p + ".phone", 60),
+      email: sStr(opt(c, "email"), p + ".email", 120)
+    };
+  }
+  function sCustomer(c, p) {
+    var out = { id: sId(opt(sObj(c, p), "id"), p + ".id") };
+    var party = sParty(c, p);
+    Object.keys(party).forEach(function (k) { out[k] = party[k]; });
+    return out;
+  }
+  function sCatalog(c, p) {
+    c = sObj(c, p);
+    return {
+      id: sId(opt(c, "id"), p + ".id"),
+      name: sStr(opt(c, "name"), p + ".name", 200),
+      unit: sStr(opt(c, "unit"), p + ".unit", 20),
+      rate_cents: sCents(opt(c, "rate_cents"), p + ".rate_cents"),
+      taxable: sBool(opt(c, "taxable"), p + ".taxable")
+    };
+  }
+  function sItem(it, p) {
+    it = sObj(it, p);
+    return {
+      name: sStr(opt(it, "name"), p + ".name", 200),
+      unit: sStr(opt(it, "unit"), p + ".unit", 20),
+      qty: sNum(opt(it, "qty"), p + ".qty", 3, 0, MAX_QTY),
+      rate_cents: sCents(opt(it, "rate_cents"), p + ".rate_cents"),
+      taxable: sBool(opt(it, "taxable"), p + ".taxable"),
+      discount_pct: sNum(opt(it, "discount_pct"), p + ".discount_pct", 2, 0, 100)
+    };
+  }
+  function sPayment(x, p) {
+    x = sObj(x, p);
+    return {
+      date: sDate(opt(x, "date"), p + ".date", true),
+      amount_cents: sCents(opt(x, "amount_cents"), p + ".amount_cents"),
+      note: sStr(opt(x, "note"), p + ".note", 120)
+    };
+  }
+  function sDay(x, p) {
+    x = sObj(x, p);
+    return {
+      date: sDate(opt(x, "date"), p + ".date", true),
+      start: sTime(opt(x, "start"), p + ".start", false),
+      end: sTime(opt(x, "end"), p + ".end", true),
+      note: sStr(opt(x, "note"), p + ".note", 200)
+    };
+  }
+  var OIL_TEXT = [["operator", 120], ["afe", 60], ["lease", 120], ["well", 120], ["rig", 60],
+    ["county", 60], ["state", 40], ["po", 60], ["crew", 300]];
+  function sOil(o, p) {
+    o = sObj(o, p);
+    var out = { enabled: sBool(opt(o, "enabled"), p + ".enabled") };
+    OIL_TEXT.forEach(function (kn) { out[kn[0]] = sStr(opt(o, kn[0]), p + "." + kn[0], kn[1]); });
+    out.days = mapList(opt(o, "days"), p + ".days", MAX_DAYS, sDay);
+    out.sig_company = sDataUrl(opt(o, "sig_company"), p + ".sig_company", SIG_MAX_CHARS);
+    out.sig_company_name = sStr(opt(o, "sig_company_name"), p + ".sig_company_name", 120);
+    out.sig_crew = sDataUrl(opt(o, "sig_crew"), p + ".sig_crew", SIG_MAX_CHARS);
+    out.sig_crew_name = sStr(opt(o, "sig_crew_name"), p + ".sig_crew_name", 120);
+    return out;
+  }
+  function sDoc(d, p) {
+    d = sObj(d, p);
+    var kind = sEnum(opt(d, "discount_kind"), p + ".discount_kind", DISC_KINDS, "pct");
+    var dval = kind === "pct" ? sNum(opt(d, "discount_value"), p + ".discount_value", 2, 0, 100)
+      : sCents(opt(d, "discount_value"), p + ".discount_value");
+    var out = {};
+    out.id = sId(opt(d, "id"), p + ".id");
+    out.type = sEnum(opt(d, "type"), p + ".type", DOC_TYPES, null) || bad(p + ".type", "is missing.");
+    out.number = sStr(opt(d, "number"), p + ".number", 40);
+    out.status = sEnum(opt(d, "status"), p + ".status", STATUS_KEYS, "draft");
+    out.issue_date = sDate(opt(d, "issue_date"), p + ".issue_date", false);
+    out.terms = sEnum(opt(d, "terms"), p + ".terms", TERMS_KEYS, "net30");
+    out.customer = sParty(opt(d, "customer"), p + ".customer");
+    out.items = mapList(opt(d, "items"), p + ".items", MAX_ITEMS, sItem);
+    out.discount_kind = kind;
+    out.discount_value = dval;
+    out.tax_rate_pct = sNum(opt(d, "tax_rate_pct"), p + ".tax_rate_pct", 3, 0, 100);
+    out.tax_mode = sEnum(opt(d, "tax_mode"), p + ".tax_mode", TAX_MODES, "document");
+    out.shipping_label = sStr(opt(d, "shipping_label"), p + ".shipping_label", 60, false, "Shipping / mileage");
+    out.shipping_cents = sCents(opt(d, "shipping_cents"), p + ".shipping_cents");
+    out.deposit_cents = sCents(opt(d, "deposit_cents"), p + ".deposit_cents");
+    out.payments = mapList(opt(d, "payments"), p + ".payments", MAX_PAYMENTS, sPayment);
+    out.notes = sStr(opt(d, "notes"), p + ".notes", 2000, true);
+    out.sources = mapList(opt(d, "sources"), p + ".sources", MAX_SOURCES, function (x, q) { return sStr(x, q, 40); });
+    out.converted_to = sStr(opt(d, "converted_to"), p + ".converted_to", 40);
+    out.example = sBool(opt(d, "example"), p + ".example");
+    out.oil = sOil(opt(d, "oil"), p + ".oil");
+    return out;
+  }
+  function sSettings(s, p) {
+    s = sObj(s, p);
+    var pre = sObj(opt(s, "prefix"), p + ".prefix");
+    var nxt = sObj(opt(s, "next"), p + ".next");
+    var defs = { estimate: "EST-", ticket: "FT-", invoice: "INV-" }, prefix = {}, next = {};
+    DOC_TYPES.forEach(function (k) { prefix[k] = sStr(opt(pre, k), p + ".prefix." + k, 12, false, defs[k]); });
+    DOC_TYPES.forEach(function (k) { next[k] = sInt(opt(nxt, k), p + ".next." + k, 1, 999999, 1); });
+    return { prefix: prefix, next: next, oil_default: sBool(opt(s, "oil_default"), p + ".oil_default") };
+  }
+  function sanitizeInner(raw) {
+    if (!isObj(raw)) throw FieldTicketError("bad_import", "The backup must be a JSON object.");
+    if (opt(raw, "app") !== "field-ticket") throw FieldTicketError("bad_import", 'This is not a Field Ticket backup (missing "app": "field-ticket").');
+    var ver = opt(raw, "version");
+    if (!isNumber(ver) || ver !== SCHEMA_VERSION) throw FieldTicketError("bad_import", "This backup's version is not supported; this tool reads version " + SCHEMA_VERSION + ".");
+    var out = {
+      app: "field-ticket", version: SCHEMA_VERSION,
+      business: sBusiness(opt(raw, "business"), "business"),
+      settings: sSettings(opt(raw, "settings"), "settings"),
+      customers: mapList(opt(raw, "customers"), "customers", MAX_CUSTOMERS, sCustomer),
+      catalog: mapList(opt(raw, "catalog"), "catalog", MAX_CATALOG, sCatalog),
+      docs: mapList(opt(raw, "docs"), "docs", MAX_DOCS, sDoc)
+    };
+    ["customers", "catalog", "docs"].forEach(function (key) {
+      var seen = Object.create(null);
+      out[key].forEach(function (x, i) {
+        if (seen[x.id]) bad(key + "[" + i + "].id", "repeats an earlier id.");
+        seen[x.id] = true;
+      });
+    });
+    return out;
+  }
+  function sanitizeState(raw) {
+    try { return sanitizeInner(raw); } catch (e) {
+      if (e && e.code) throw FieldTicketError("bad_import", e.message);
+      throw e;
+    }
+  }
+
+  // ------------------------------------------------------------ example state (all invented)
+  var EX_BUSINESS = {
+    name: "Example Co.", address: "100 Sample Road\nMidland, TX 79701", phone: "(555) 010-0100",
+    email: "office@example.com", tax_id: "TX Lic. 000000", logo: "", tax_rate_pct: 8.25, tax_mode: "document",
+    terms: "net30", payment_instructions: "Pay by check to Example Co. or by ACH. Reference the invoice number."
+  };
+  var EX_CATALOG = [
+    { id: "excat1", name: "Vacuum truck, 130 bbl", unit: "hr", rate_cents: 12500, taxable: false },
+    { id: "excat2", name: "Roustabout crew, 3 hands", unit: "hr", rate_cents: 19500, taxable: false },
+    { id: "excat3", name: "Pickup mileage", unit: "mi", rate_cents: 85, taxable: false },
+    { id: "excat4", name: "Fittings and valves", unit: "ea", rate_cents: 4275, taxable: true },
+    { id: "excat5", name: "Service call", unit: "ea", rate_cents: 9500, taxable: false }
+  ];
+  var EX_CUSTOMERS = [
+    { id: "excus1", name: "Sample Operating LLC", contact: "Field office", address: "200 Example Ave\nOdessa, TX 79761", phone: "(555) 010-0200", email: "ap@example.com" },
+    { id: "excus2", name: "Sample Storage Yard", contact: "Yard manager", address: "300 Demo Lane\nMidland, TX 79703", phone: "(555) 010-0300", email: "yard@example.com" }
+  ];
+  function party(c) { return { name: c.name, contact: c.contact, address: c.address, phone: c.phone, email: c.email }; }
+  function oilBlank() {
+    return { enabled: false, operator: "", afe: "", lease: "", well: "", rig: "", county: "", state: "", po: "", crew: "",
+      days: [], sig_company: "", sig_company_name: "", sig_crew: "", sig_crew_name: "" };
+  }
+  function it(name, unit, qty, rate, taxable, disc) { return { name: name, unit: unit, qty: qty, rate_cents: rate, taxable: taxable, discount_pct: disc }; }
+  function exampleState(today) {
+    var invDate = addDays(today, -6), t1 = addDays(today, -2), t2 = addDays(today, -1);
+    var invoice = {
+      id: "exdoc1", type: "invoice", number: "INV-0001", status: "sent", issue_date: invDate, terms: "net30",
+      customer: party(EX_CUSTOMERS[1]),
+      items: [it("Service call", "ea", 1, 9500, false, 0), it("Replace yard gate latch and hinge", "hr", 2.5, 8500, false, 0),
+        it("Fittings and valves", "ea", 6, 4275, true, 10)],
+      discount_kind: "pct", discount_value: 0, tax_rate_pct: 8.25, tax_mode: "document",
+      shipping_label: "Shipping / mileage", shipping_cents: 3400, deposit_cents: 10000, payments: [],
+      notes: "Example data. Sample invoice for a yard repair.", sources: [], converted_to: "", example: true, oil: oilBlank()
+    };
+    var oil = oilBlank();
+    oil.enabled = true; oil.operator = "Sample Operating LLC"; oil.afe = "AFE 00-000"; oil.lease = "Example Ranch";
+    oil.well = "Example Ranch 1H"; oil.rig = "Workover rig 0"; oil.county = "Sample County"; oil.state = "TX";
+    oil.po = "PO 000000"; oil.crew = "Crew lead A. Sample, hands B. Sample and C. Sample";
+    oil.days = [{ date: t1, start: "06:00", end: "17:30", note: "Haul fluid, flowback tank" },
+      { date: t2, start: "19:00", end: "03:15", note: "Night run, across midnight" }];
+    var ticket = {
+      id: "exdoc2", type: "ticket", number: "FT-0001", status: "draft", issue_date: t2, terms: "net30",
+      customer: party(EX_CUSTOMERS[0]),
+      items: [it("Vacuum truck, 130 bbl", "hr", 19.75, 12500, false, 0), it("Roustabout crew, 3 hands", "hr", 11.5, 19500, false, 0),
+        it("Pickup mileage", "mi", 142, 85, false, 0), it("Fittings and valves", "ea", 3, 4275, true, 0)],
+      discount_kind: "pct", discount_value: 0, tax_rate_pct: 8.25, tax_mode: "line",
+      shipping_label: "Shipping / mileage", shipping_cents: 0, deposit_cents: 0, payments: [],
+      notes: "Example data. Sample oilfield field ticket with two days of work.", sources: [], converted_to: "", example: true, oil: oil
+    };
+    return {
+      app: "field-ticket", version: 1, business: clone(EX_BUSINESS),
+      settings: { prefix: { estimate: "EST-", ticket: "FT-", invoice: "INV-" }, next: { estimate: 1, ticket: 2, invoice: 2 }, oil_default: true },
+      customers: clone(EX_CUSTOMERS), catalog: clone(EX_CATALOG), docs: [invoice, ticket]
+    };
+  }
+  function blankBusiness() {
+    var b = {};
+    Object.keys(EX_BUSINESS).forEach(function (k) { b[k] = typeof EX_BUSINESS[k] === "string" ? "" : EX_BUSINESS[k]; });
+    b.tax_rate_pct = 0; b.tax_mode = "document"; b.terms = "net30";
+    return b;
+  }
+  function blankState() {
+    var st = exampleState("2000-01-01");
+    st.business = blankBusiness();
+    st.settings.next = { estimate: 1, ticket: 1, invoice: 1 };
+    st.customers = []; st.catalog = []; st.docs = [];
+    return st;
+  }
+  function clearExamples(state) {
+    var st = clone(state);
+    st.docs = st.docs.filter(function (d) { return !d.example; });
+    st.customers = st.customers.filter(function (c) { return c.id.indexOf("excus") !== 0; });
+    st.catalog = st.catalog.filter(function (c) { return c.id.indexOf("excat") !== 0; });
+    if (st.business.name === EX_BUSINESS.name) st.business = blankBusiness();
+    if (!st.docs.length) st.settings.next = { estimate: 1, ticket: 1, invoice: 1 };
+    return st;
+  }
+
+  return {
+    MAX_CENTS: MAX_CENTS, MAX_QTY: MAX_QTY, MAX_ITEMS: MAX_ITEMS, TERMS: TERMS, TERMS_KEYS: TERMS_KEYS,
+    TERMS_LABEL: TERMS_LABEL, TYPE_LABEL: TYPE_LABEL, SCHEMA_VERSION: SCHEMA_VERSION, LOGO_MAX_CHARS: LOGO_MAX_CHARS,
+    SIG_MAX_CHARS: SIG_MAX_CHARS, MAX_DAYS: MAX_DAYS, MAX_PAYMENTS: MAX_PAYMENTS,
+    divRound: divRound, divRoundBig: divRoundBig, scaled: scaled, lineTotals: lineTotals, allocate: allocate,
+    computeTotals: computeTotals, parseDate: parseDate, addDays: addDays, dueDate: dueDate, daysBetween: daysBetween,
+    parseTime: parseTime, shiftMinutes: shiftMinutes, ticketMinutes: ticketMinutes, hoursQty: hoursQty,
+    formatHours: formatHours, formatMoney: formatMoney, centsPlain: centsPlain, formatDocNumber: formatDocNumber,
+    scaledText: scaledText, docStatus: docStatus, summarize: summarize, estimateToInvoice: estimateToInvoice,
+    ticketsToInvoice: ticketsToInvoice, customerKey: customerKey, parseDecimal: parseDecimal, parseMoney: parseMoney,
+    csvCell: csvCell, docsCsv: docsCsv, sanitizeState: sanitizeState, exampleState: exampleState,
+    blankState: blankState, clearExamples: clearExamples, oilBlank: oilBlank, clone: clone
+  };
+})();
+</script>
+
+<script id="ui">
+// UI: DOM, storage, signatures, logo, preview, and PDF. All user text goes in through textContent or jsPDF text calls.
+(function () {
+  "use strict";
+  var KEY = "field-ticket:v1";
+  var KEY_UNREADABLE = "field-ticket:v1:unreadable";
+  var IMPORT_MAX_CHARS = 20 * 1024 * 1024;
+  var LOGO_FILE_MAX = 2 * 1024 * 1024;
+  var S = null;
+  var ui = { view: "docs", docId: null, filter: "all", bundle: false, picked: {}, bundleWhy: "" };
+  var storageOk = true, saveBlocked = false, saveTimer = null, refreshTimer = null;
+  var refs = {};
+
+  function $(id) { return document.getElementById(id); }
+  function pad2(n) { return n < 10 ? "0" + n : String(n); }
+  function todayStr() { var d = new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+  function errText(e) { return e && e.message ? e.message : String(e); }
+  function newId() {
+    var a = new Uint32Array(2);
+    try { crypto.getRandomValues(a); } catch (e) { a[0] = Math.floor(Math.random() * 4294967295); a[1] = Date.now() % 4294967295; }
+    return "d" + Date.now().toString(36) + a[0].toString(36) + a[1].toString(36).slice(0, 4);
+  }
+
+  // Element builder. Text goes in as text nodes; no HTML strings anywhere.
+  function el(tag, props, kids) {
+    var n = document.createElement(tag);
+    if (props) Object.keys(props).forEach(function (k) {
+      var v = props[k];
+      if (v === null || v === undefined || v === false) return;
+      if (k === "text") n.textContent = v;
+      else if (k === "class") n.className = v;
+      else if (k === "on") Object.keys(v).forEach(function (ev) { n.addEventListener(ev, v[ev]); });
+      else if (k === "value") n.value = v;
+      else if (k === "checked") n.checked = true;
+      else if (/^on/i.test(k)) throw new Error("inline handlers are not allowed");
+      else n.setAttribute(k, v === true ? "" : String(v));
+    });
+    (kids || []).forEach(function (c) {
+      if (c === null || c === undefined || c === false) return;
+      n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return n;
+  }
+  function btn(id, text, onClick, cls) { return el("button", { type: "button", id: id, class: cls, text: text, on: { click: onClick } }); }
+
+  // ------------------------------------------------------------ storage
+  function setStore(text, warn) {
+    var s = $("store-status");
+    s.textContent = text;
+    s.className = "store" + (warn ? " warn" : "");
+  }
+  function load() {
+    var raw = null;
+    try { raw = window.localStorage.getItem(KEY); } catch (e) { storageOk = false; }
+    if (raw) {
+      try {
+        S = FT.sanitizeState(JSON.parse(raw));
+        setStore("Loaded from this device.");
+        return;
+      } catch (e) {
+        saveBlocked = true;
+        S = FT.exampleState(todayStr());
+        // Keep a copy of the unreadable data under its own key, so Start fresh or Import can never erase it.
+        var kept = false;
+        try {
+          if (window.localStorage.getItem(KEY_UNREADABLE) === null) window.localStorage.setItem(KEY_UNREADABLE, raw);
+          kept = window.localStorage.getItem(KEY_UNREADABLE) === raw;
+        } catch (e2) { kept = false; }
+        setStore("Saved data on this device could not be read (" + errText(e) + "). It was left as is" + (kept ? " and a copy is kept under \"" + KEY_UNREADABLE + "\"" : "") + ". Example data is shown, and nothing will be saved until you choose Start fresh or import a backup.", true);
+        return;
+      }
+    }
+    S = FT.exampleState(todayStr());
+    if (!storageOk) setStore("This browser blocks storage here, so nothing is kept after you close the page. Use Backup to export your work.", true);
+  }
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 400);
+  }
+  function saveNow() {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    if (saveBlocked) return;
+    if (!storageOk) {
+      setStore("This browser blocks storage here, so nothing is kept after you close the page. Use Backup to export your work.", true);
+      return;
+    }
+    try {
+      window.localStorage.setItem(KEY, JSON.stringify(S));
+      var d = new Date();
+      setStore("Saved on this device at " + pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ".");
+    } catch (e) {
+      setStore("Could not save: this browser's storage is full or blocked. Export a backup now, then remove the logo, signatures, or old documents.", true);
+    }
+  }
+  function flush() { if (saveTimer) saveNow(); }
+
+  function changed(structural) {
+    scheduleSave();
+    if (structural) render(); else scheduleRefresh();
+  }
+
+  // ------------------------------------------------------------ helpers over state
+  function findDoc(id) { for (var i = 0; i < S.docs.length; i++) if (S.docs[i].id === id) return S.docs[i]; return null; }
+  function findByNumber(num) { for (var i = 0; i < S.docs.length; i++) if (S.docs[i].number === num) return S.docs[i]; return null; }
+  function safeTotals(d) { try { return FT.computeTotals(d); } catch (e) { return null; } }
+  function safeStatus(d, today) { try { return FT.docStatus(d, today); } catch (e) { return d.status; } }
+  function nextNumber(type) {
+    var n = S.settings.next[type];
+    S.settings.next[type] = Math.min(n + 1, 999999);
+    return FT.formatDocNumber(S.settings.prefix[type], n);
+  }
+  function hasExamples() {
+    return S.docs.some(function (d) { return d.example; }) || S.business.name === "Example Co." ||
+      S.customers.some(function (c) { return c.id.indexOf("excus") === 0; }) || S.catalog.some(function (c) { return c.id.indexOf("excat") === 0; });
+  }
+  function pctText(v, places) { try { return FT.scaledText(FT.scaled(v, places, 0, 100, "x"), places); } catch (e) { return String(v); } }
+  function qtyText(v) { try { return FT.scaledText(FT.scaled(v, 3, 0, FT.MAX_QTY, "x"), 3); } catch (e) { return String(v); } }
+  var STATUS_CLASS = { draft: "muted", sent: "", paid: "good", overdue: "bad", converted: "muted" };
+  var STATUS_LABEL = { draft: "Draft", sent: "Sent", paid: "Paid", overdue: "Overdue", converted: "Converted" };
+  function chip(status) { return el("span", { class: "chip " + (STATUS_CLASS[status] || ""), text: STATUS_LABEL[status] || status }); }
+  function blankParty() { return { name: "", contact: "", address: "", phone: "", email: "" }; }
+
+  // ------------------------------------------------------------ fields
+  var fieldErr = {};
+  function field(id, label, input, opts) {
+    opts = opts || {};
+    var err = el("p", { class: "err", id: id + "-err", "aria-live": "polite" });
+    fieldErr[id] = err;
+    return el("div", { class: "field" + (opts.wide ? " wide" : "") }, [el("label", { for: id, text: label }), input, err]);
+  }
+  function textInput(id, value, onInput, opts) {
+    opts = opts || {};
+    var tag = opts.multiline ? "textarea" : "input";
+    var p = { id: id, value: value || "", maxlength: opts.max || 200, autocomplete: "off" };
+    if (!opts.multiline) p.type = opts.type || "text";
+    if (opts.placeholder) p.placeholder = opts.placeholder;
+    if (opts.inputmode) p.inputmode = opts.inputmode;
+    var n = el(tag, p);
+    n.addEventListener("input", function () { onInput(n.value); changed(false); });
+    return n;
+  }
+  function textField(id, label, value, onInput, opts) { return field(id, label, textInput(id, value, onInput, opts), opts); }
+  // A numeric text box: parse(text) returns the value or throws a FieldTicketError with a readable message.
+  function numInput(id, text, parse, apply) {
+    var n = el("input", { id: id, type: "text", class: "num", value: text, inputmode: "decimal", autocomplete: "off", maxlength: 20 });
+    n.addEventListener("input", function () {
+      var err = fieldErr[id];
+      try {
+        apply(parse(n.value));
+        n.removeAttribute("aria-invalid");
+        if (err) err.textContent = "";
+        changed(false);
+      } catch (e) {
+        n.setAttribute("aria-invalid", "true");
+        if (err) err.textContent = errText(e);
+      }
+    });
+    return n;
+  }
+  function moneyParse(name) { return function (t) { return FT.parseMoney(t, name); }; }
+  function decParse(name, places, hiScaled) {
+    return function (t) { return FT.parseDecimal(t, places, name, hiScaled) / Math.pow(10, places); };
+  }
+  function seg(id, label, options, current, onPick) {
+    var wrap = el("div", { class: "seg", role: "group", "aria-labelledby": id + "-lbl", id: id });
+    options.forEach(function (o) {
+      wrap.appendChild(el("button", { type: "button", id: id + "-" + o[0], "aria-pressed": o[0] === current ? "true" : "false", text: o[1],
+        on: { click: function () { onPick(o[0]); } } }));
+    });
+    return el("div", { class: "field" }, [el("span", { class: "lbl", id: id + "-lbl", text: label }), wrap]);
+  }
+  function check(id, label, value, onChange) {
+    var box = el("input", { type: "checkbox", id: id, checked: value });
+    box.addEventListener("change", function () { onChange(box.checked); });
+    return el("label", { class: "check", for: id }, [box, el("span", { text: label })]);
+  }
+  function confirmBox(text, yesText, onYes) {
+    var box = el("div", { class: "confirm", role: "alertdialog", "aria-label": text });
+    box.appendChild(el("p", { text: text }));
+    var yes = btn(null, yesText, function () { box.remove(); onYes(); }, "danger");
+    var no = btn(null, "Cancel", function () { box.remove(); });
+    box.appendChild(el("div", { class: "row" }, [yes, no]));
+    setTimeout(function () { no.focus(); }, 0);
+    return box;
+  }
+  function copyText(text, host, msgEl) {
+    function fallback() {
+      host.replaceChildren();
+      var ta = el("textarea", { class: "mono", id: host.id + "-text", readonly: true, "aria-label": "Text to copy" });
+      ta.value = text;
+      host.appendChild(el("p", { class: "msg", text: "Copy is blocked here. Select the text below and copy it." }));
+      host.appendChild(ta);
+      ta.focus(); ta.select();
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () {
+        msgEl.className = "msg good"; msgEl.textContent = "Copied to the clipboard.";
+      }, fallback);
+    } catch (e) { fallback(); }
+  }
+
+  // ------------------------------------------------------------ top level
+  function render() {
+    refs = {};
+    fieldErr = {};
+    $("example-banner").hidden = !hasExamples();
+    var view = $("view");
+    view.replaceChildren();
+    var navView = ui.view === "doc" ? "docs" : ui.view;
+    Array.prototype.forEach.call(document.querySelectorAll("#nav button"), function (b) {
+      if (b.getAttribute("data-view") === navView) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+    });
+    if (ui.view === "doc" && !findDoc(ui.docId)) ui.view = "docs";
+    if (ui.view === "docs") renderDocs(view);
+    else if (ui.view === "doc") renderEditor(view, findDoc(ui.docId));
+    else if (ui.view === "business") renderBusiness(view);
+    else if (ui.view === "customers") renderCustomers(view);
+    else if (ui.view === "catalog") renderCatalog(view);
+    else renderBackup(view);
+  }
+  function go(view, docId) {
+    flush();
+    ui.view = view;
+    ui.docId = docId || null;
+    render();
+    try { window.scrollTo(0, 0); } catch (e) { /* ignore */ }
+  }
+
+  // ------------------------------------------------------------ documents list
+  function renderDocs(view) {
+    var today = todayStr();
+    var sum;
+    try { sum = FT.summarize(S.docs, today); } catch (e) { sum = { counts: {}, outstanding: 0, overdue: 0 }; }
+    var p = el("section", { class: "panel", "aria-labelledby": "docs-h" });
+    p.appendChild(el("div", { class: "panel-head" }, [el("h2", { id: "docs-h", text: "Documents" })]));
+    p.appendChild(el("div", { class: "row" }, [
+      btn("new-estimate", "New estimate", function () { createDoc("estimate"); }, "primary"),
+      btn("new-ticket", "New field ticket", function () { createDoc("ticket"); }, "primary"),
+      btn("new-invoice", "New invoice", function () { createDoc("invoice"); }, "primary")
+    ]));
+    var stat = function (k, v, cls) { return el("div", { class: "stat " + (cls || "") }, [el("span", { class: "k", text: k }), el("span", { class: "v", text: v })]); };
+    p.appendChild(el("div", { class: "stats", "aria-label": "Totals" }, [
+      stat("Outstanding", FT.formatMoney(sum.outstanding)),
+      stat("Overdue", FT.formatMoney(sum.overdue), sum.overdue > 0 ? "over" : ""),
+      stat("Open invoices", String((sum.counts.sent || 0) + (sum.counts.overdue || 0))),
+      stat("Drafts", String(sum.counts.draft || 0))
+    ]));
+    p.appendChild(el("p", { class: "hint", text: "Outstanding is the balance on invoices marked Sent, including overdue ones. Drafts are not counted until you mark them Sent." }));
+
+    p.appendChild(seg("filter", "Show", [["all", "All"], ["invoice", "Invoices"], ["ticket", "Field tickets"], ["estimate", "Estimates"], ["open", "Unpaid"]],
+      ui.filter, function (f) { ui.filter = f; render(); }));
+
+    var openTickets = S.docs.filter(function (d) { return d.type === "ticket" && !d.converted_to; });
+    var bundleRow = el("div", { class: "stack" });
+    if (!ui.bundle) {
+      bundleRow.appendChild(el("div", { class: "row" }, [
+        btn("bundle-start", "Invoice several field tickets", function () { ui.bundle = true; ui.picked = {}; ui.bundleWhy = ""; ui.filter = "ticket"; render(); }, null)
+      ]));
+    } else {
+      var n = Object.keys(ui.picked).filter(function (k) { return ui.picked[k]; }).length;
+      var bmsg = el("p", { class: "msg bad", id: "bundle-msg", "aria-live": "polite" });
+      bundleRow.appendChild(el("p", { class: "hint", id: "bundle-why", text: ui.bundleWhy || (openTickets.length ? "Tick the field tickets to bundle. They must share a customer and tax settings." : "There are no field tickets waiting to be invoiced.") }));
+      bundleRow.appendChild(el("div", { class: "row" }, [
+        btn("bundle-make", "Make invoice from " + n + " ticket" + (n === 1 ? "" : "s"), function () { bundleSelected(bmsg, fixHost); }, "primary"),
+        btn("bundle-cancel", "Cancel", function () { ui.bundle = false; ui.picked = {}; render(); }, null)
+      ]));
+      bundleRow.appendChild(bmsg);
+      var fixHost = el("div", { class: "row", id: "bundle-fix" });
+      bundleRow.appendChild(fixHost);
+    }
+    p.appendChild(bundleRow);
+
+    var docs = S.docs.slice().sort(function (a, b) {
+      if (a.issue_date !== b.issue_date) return a.issue_date < b.issue_date ? 1 : -1;
+      return a.number < b.number ? 1 : a.number > b.number ? -1 : 0;
+    }).filter(function (d) {
+      if (ui.filter === "all") return true;
+      if (ui.filter === "open") { var st = safeStatus(d, today); return d.type === "invoice" && (st === "sent" || st === "overdue"); }
+      return d.type === ui.filter;
+    });
+    var list = el("ul", { class: "docs", id: "doc-list" });
+    docs.forEach(function (d) {
+      var t = safeTotals(d);
+      var st = safeStatus(d, today);
+      var due = d.type === "invoice" ? FT.dueDate(d.issue_date, d.terms) : "";
+      var top = el("span", { class: "doc-top" }, [
+        el("span", { class: "doc-num", text: d.number || "(no number)" }),
+        el("span", { class: "doc-type", text: FT.TYPE_LABEL[d.type] }),
+        chip(st),
+        d.example ? el("span", { class: "chip warn", text: "Example" }) : null,
+        d.oil.enabled ? el("span", { class: "chip muted", text: "Oilfield" }) : null
+      ]);
+      var money = el("span", { class: "doc-money" }, [
+        el("span", { text: d.issue_date + (due ? "  due " + due : "") }),
+        el("span", {}, [d.type === "invoice" && t ? "Balance " : "Total ", el("span", { class: "n", text: t ? FT.formatMoney(d.type === "invoice" ? t.balance : t.total) : "check lines" })])
+      ]);
+      var li = el("li", {}, [
+        el("button", { type: "button", class: "doc-open", id: "open-" + d.id, "aria-label": "Open " + FT.TYPE_LABEL[d.type] + " " + d.number,
+          on: { click: function () { go("doc", d.id); } } }, [top, el("span", { class: "doc-cust", text: d.customer.name || "No customer yet" }), money])
+      ]);
+      if (ui.bundle && d.type === "ticket" && !d.converted_to) {
+        li.appendChild(el("div", { class: "pick" }, [check("pick-" + d.id, "Include " + d.number + " in the invoice", !!ui.picked[d.id], function (v) { ui.picked[d.id] = v; render(); })]));
+      }
+      list.appendChild(li);
+    });
+    if (!docs.length) list.appendChild(el("li", { class: "hint", text: S.docs.length ? "Nothing matches this filter." : "No documents yet. Start one with the buttons above." }));
+    p.appendChild(list);
+
+    var csvHost = el("div", { id: "csv-host", class: "stack" });
+    var csvMsg = el("p", { class: "msg", "aria-live": "polite" });
+    p.appendChild(el("div", { class: "row" }, [btn("copy-csv", "Copy list as CSV", function () {
+      var text;
+      try { text = FT.docsCsv(S.docs.filter(function (d) { return safeTotals(d); }), today); } catch (e) { csvMsg.textContent = errText(e); return; }
+      copyText(text, csvHost, csvMsg);
+    }, null)]));
+    p.appendChild(csvMsg);
+    p.appendChild(csvHost);
+    view.appendChild(p);
+  }
+
+  function createDoc(type) {
+    var b = S.business;
+    var today = todayStr();
+    var d = {
+      id: newId(), type: type, number: nextNumber(type), status: "draft", issue_date: today, terms: b.terms,
+      customer: blankParty(), items: [], discount_kind: "pct", discount_value: 0, tax_rate_pct: b.tax_rate_pct,
+      tax_mode: b.tax_mode, shipping_label: "Shipping / mileage", shipping_cents: 0, deposit_cents: 0, payments: [],
+      notes: "", sources: [], converted_to: "", example: false, oil: FT.oilBlank()
+    };
+    if (type === "ticket") {
+      d.oil.enabled = S.settings.oil_default;
+      d.oil.days = [{ date: today, start: "", end: "", note: "" }];
+    }
+    S.docs.push(d);
+    scheduleSave();
+    go("doc", d.id);
+  }
+
+  function taxLabel(t) { return pctText(t.tax_rate_pct, 3) + "% tax, " + (t.tax_mode === "line" ? "rounded per line" : "rounded once per document"); }
+  function bundleSelected(msgEl, fixHost) {
+    var picked = S.docs.filter(function (d) { return ui.picked[d.id] && d.type === "ticket" && !d.converted_to; })
+      .sort(function (a, b) { return a.issue_date < b.issue_date ? -1 : a.issue_date > b.issue_date ? 1 : (a.number < b.number ? -1 : 1); });
+    try {
+      var inv = FT.ticketsToInvoice(picked, newId(), FT.formatDocNumber(S.settings.prefix.invoice, S.settings.next.invoice), todayStr());
+      inv.example = false;
+      inv.terms = S.business.terms;
+      nextNumber("invoice");
+      picked.forEach(function (t) { t.converted_to = inv.number; });
+      S.docs.push(inv);
+      ui.bundle = false; ui.picked = {};
+      scheduleSave();
+      go("doc", inv.id);
+    } catch (e) {
+      msgEl.textContent = errText(e);
+      if (fixHost) fixHost.replaceChildren();
+      if (e.code === "mixed_tax" && fixHost) {
+        // Only the user knows which tax applies. Ask right here, then bundle.
+        msgEl.textContent = "These tickets use different tax settings. One invoice has one tax setting. Which one applies?";
+        var seen = {};
+        picked.forEach(function (t, i) {
+          var k = t.tax_rate_pct + "|" + t.tax_mode;
+          if (seen[k]) return; seen[k] = true;
+          fixHost.appendChild(btn("bundle-tax-" + i, "Use " + taxLabel(t) + " (as on " + t.number + ")", function () {
+            picked.forEach(function (x) { x.tax_rate_pct = t.tax_rate_pct; x.tax_mode = t.tax_mode; });
+            bundleSelected(msgEl, fixHost);
+          }, null));
+        });
+      }
+    }
+  }
+
+  // ------------------------------------------------------------ editor
+  function renderEditor(view, d) {
+    var isInv = d.type === "invoice";
+    // Head
+    var head = el("section", { class: "panel", "aria-labelledby": "ed-h" });
+    head.appendChild(el("div", { class: "row" }, [btn("ed-back", "All documents", function () { go("docs"); }, "quiet")]));
+    refs.chip = el("span", {});
+    head.appendChild(el("div", { class: "panel-head" }, [el("h2", { id: "ed-h", text: FT.TYPE_LABEL[d.type] + (d.example ? " (example)" : "") }), refs.chip]));
+    var links = el("div", { class: "row" });
+    if (d.sources.length) {
+      links.appendChild(el("span", { class: "hint", text: "Made from" }));
+      d.sources.forEach(function (num) {
+        var src = findByNumber(num);
+        links.appendChild(src ? btn("src-" + src.id, num, function () { go("doc", src.id); }, "quiet") : el("span", { class: "doc-num", text: num }));
+      });
+    }
+    if (d.converted_to) {
+      var tgt = findByNumber(d.converted_to);
+      links.appendChild(el("span", { class: "hint", text: "Invoiced on" }));
+      links.appendChild(tgt ? btn("tgt-" + tgt.id, d.converted_to, function () { go("doc", tgt.id); }, "quiet") : el("span", { class: "doc-num", text: d.converted_to }));
+    }
+    if (links.childNodes.length) head.appendChild(links);
+    var g = el("div", { class: "fields" });
+    g.appendChild(textField("ed-number", "Number", d.number, function (v) { d.number = v; }, { max: 40 }));
+    g.appendChild(field("ed-date", "Date", (function () {
+      var n = el("input", { type: "date", id: "ed-date", value: d.issue_date, min: "1900-01-01", max: "2999-12-31" });
+      n.addEventListener("change", function () {
+        try { FT.parseDate(n.value, "Date"); d.issue_date = n.value; n.removeAttribute("aria-invalid"); fieldErr["ed-date"].textContent = ""; changed(false); }
+        catch (e) { n.setAttribute("aria-invalid", "true"); fieldErr["ed-date"].textContent = "Pick a date."; }
+      });
+      return n;
+    })()));
+    if (isInv) {
+      var terms = el("select", { id: "ed-terms" }, FT.TERMS_KEYS.map(function (k) { return el("option", { value: k, text: FT.TERMS_LABEL[k] }); }));
+      terms.value = d.terms;
+      terms.addEventListener("change", function () { d.terms = terms.value; changed(false); });
+      g.appendChild(field("ed-terms", "Payment terms", terms));
+      refs.due = el("output", { id: "ed-due", for: "ed-date ed-terms" });
+      g.appendChild(el("div", { class: "field" }, [el("label", { for: "ed-due", text: "Due date" }), refs.due]));
+    }
+    head.appendChild(g);
+    var statuses = isInv ? [["draft", "Draft"], ["sent", "Sent"], ["paid", "Paid"]] : [["draft", "Draft"], ["sent", "Sent"]];
+    head.appendChild(seg("ed-status", "Status", statuses, d.status, function (s) { d.status = s; changed(true); }));
+    if (isInv) head.appendChild(el("p", { class: "hint", text: "Overdue is worked out from the due date. Paid is set for you when deposit and payments cover the total." }));
+    view.appendChild(head);
+
+    view.appendChild(customerPanel(d));
+    view.appendChild(oilPanel(d));
+    view.appendChild(itemsPanel(d));
+    view.appendChild(pricingPanel(d));
+    view.appendChild(actionsPanel(d));
+    view.appendChild(outputPanel(d));
+    refresh();
+  }
+
+  function customerPanel(d) {
+    var p = el("section", { class: "panel", "aria-labelledby": "cu-h" }, [el("h3", { id: "cu-h", text: d.type === "estimate" ? "Prepared for" : "Bill to" })]);
+    if (S.customers.length) {
+      var sel = el("select", { id: "cu-pick" }, [el("option", { value: "", text: "Pick a saved customer" })].concat(
+        S.customers.map(function (c) { return el("option", { value: c.id, text: c.name || "(no name)" }); })));
+      sel.addEventListener("change", function () {
+        var c = S.customers.filter(function (x) { return x.id === sel.value; })[0];
+        if (!c) return;
+        d.customer = { name: c.name, contact: c.contact, address: c.address, phone: c.phone, email: c.email };
+        changed(true);
+      });
+      p.appendChild(field("cu-pick", "Saved customers", sel));
+    }
+    var g = el("div", { class: "fields" });
+    var c = d.customer;
+    g.appendChild(textField("cu-name", "Customer name", c.name, function (v) { c.name = v; }, { max: 120 }));
+    g.appendChild(textField("cu-contact", "Contact", c.contact, function (v) { c.contact = v; }, { max: 120 }));
+    g.appendChild(textField("cu-address", "Address", c.address, function (v) { c.address = v; }, { max: 400, multiline: true, wide: true }));
+    g.appendChild(textField("cu-phone", "Phone", c.phone, function (v) { c.phone = v; }, { max: 60, type: "tel" }));
+    g.appendChild(textField("cu-email", "Email", c.email, function (v) { c.email = v; }, { max: 120, type: "email" }));
+    p.appendChild(g);
+    var m = el("p", { class: "msg", "aria-live": "polite" });
+    p.appendChild(el("div", { class: "row" }, [btn("cu-save", "Save to customers", function () {
+      if (!c.name.trim()) { m.className = "msg bad"; m.textContent = "Enter a customer name first."; return; }
+      var key = FT.customerKey(c.name);
+      var ex = S.customers.filter(function (x) { return FT.customerKey(x.name) === key; })[0];
+      if (ex) { ex.contact = c.contact; ex.address = c.address; ex.phone = c.phone; ex.email = c.email; m.textContent = "Updated " + c.name + " in your customers."; }
+      else { S.customers.push({ id: newId(), name: c.name, contact: c.contact, address: c.address, phone: c.phone, email: c.email }); m.textContent = "Saved " + c.name + " to your customers."; }
+      m.className = "msg good";
+      scheduleSave();
+    }, null)]));
+    p.appendChild(m);
+    return p;
+  }
+
+  function oilPanel(d) {
+    var o = d.oil;
+    var p = el("section", { class: "panel", "aria-labelledby": "oil-h" }, [el("h3", { id: "oil-h", text: "Oilfield details" })]);
+    p.appendChild(check("oil-on", "Oilfield field-ticket mode (operator, AFE, well, crew hours, signatures)", o.enabled, function (v) { o.enabled = v; changed(true); }));
+    if (!o.enabled) return p;
+    var g = el("div", { class: "fields three" });
+    [["operator", "Operator", 120], ["afe", "AFE number", 60], ["lease", "Lease", 120], ["well", "Well name / number", 120],
+      ["rig", "Rig", 60], ["po", "PO number", 60], ["county", "County", 60], ["state", "State", 40]].forEach(function (f) {
+      g.appendChild(textField("oil-" + f[0], f[1], o[f[0]], function (v) { o[f[0]] = v; }, { max: f[2] }));
+    });
+    g.appendChild(textField("oil-crew", "Crew", o.crew, function (v) { o.crew = v; }, { max: 300, wide: true }));
+    p.appendChild(g);
+
+    p.appendChild(el("h3", { text: "Days and hours" }));
+    p.appendChild(el("p", { class: "hint", text: "Hours are end minus start. An end time earlier than the start counts as past midnight." }));
+    var days = el("div", { class: "days" });
+    refs.dayHours = [];
+    o.days.forEach(function (day, i) {
+      var pre = "day-" + i;
+      var hours = el("output", { id: pre + "-hrs", class: "amt", for: pre + "-start " + pre + "-end" });
+      refs.dayHours.push(hours);
+      var timeInput = function (key, label) {
+        var n = el("input", { type: "time", id: pre + "-" + key, value: day[key] });
+        n.addEventListener("input", function () {
+          try {
+            if (n.value) FT.parseTime(n.value, label, key === "end");
+            day[key] = n.value; n.removeAttribute("aria-invalid"); fieldErr[pre + "-" + key].textContent = ""; changed(false);
+          } catch (e) { n.setAttribute("aria-invalid", "true"); fieldErr[pre + "-" + key].textContent = errText(e); }
+        });
+        return field(pre + "-" + key, label, n);
+      };
+      var date = el("input", { type: "date", id: pre + "-date", value: day.date, min: "1900-01-01", max: "2999-12-31" });
+      date.addEventListener("change", function () {
+        try { if (date.value) FT.parseDate(date.value, "Date"); day.date = date.value; changed(false); } catch (e) { /* keep last good */ }
+      });
+      days.appendChild(el("div", { class: "day" }, [
+        el("div", { class: "item-head" }, [el("span", { class: "lbl", text: "Day " + (i + 1) }),
+          btn(pre + "-rm", "Remove day", function () { o.days.splice(i, 1); changed(true); }, "quiet")]),
+        el("div", { class: "grid3" }, [field(pre + "-date", "Date", date), timeInput("start", "Start"), timeInput("end", "End")]),
+        textField(pre + "-note", "Work done", day.note, function (v) { day.note = v; }, { max: 200 }),
+        el("div", { class: "foot" }, [el("span", { class: "lbl", text: "Hours" }), hours])
+      ]));
+    });
+    p.appendChild(days);
+    refs.totalHours = el("output", { id: "oil-total-hrs", class: "amt" });
+    var hm = el("p", { class: "msg", id: "day-msg", "aria-live": "polite" });
+    p.appendChild(el("div", { class: "foot" }, [el("span", {}, ["Total hours ", refs.totalHours])]));
+    p.appendChild(el("div", { class: "row" }, [
+      btn("day-add", "Add day", function () {
+        if (o.days.length >= FT.MAX_DAYS) { hm.className = "msg bad"; hm.textContent = "A document holds at most " + FT.MAX_DAYS + " days."; return; }
+        var last = o.days[o.days.length - 1];
+        var next = last && last.date ? FT.addDays(last.date, 1) : d.issue_date;
+        try { FT.parseDate(next); } catch (e) { next = ""; }
+        o.days.push({ date: next, start: last ? last.start : "", end: last ? last.end : "", note: "" });
+        changed(true);
+      }, null),
+      btn("day-labor", "Add labor line from total hours", function () {
+        var t;
+        try { t = FT.ticketMinutes(o.days).total; } catch (e) { hm.className = "msg bad"; hm.textContent = errText(e); return; }
+        if (!t) { hm.className = "msg bad"; hm.textContent = "Enter a start and end time first."; return; }
+        if (d.items.length >= FT.MAX_ITEMS) { hm.className = "msg bad"; hm.textContent = "This document has the most line items allowed."; return; }
+        var prev = lastLaborRate(d);
+        d.items.push({ name: "Labor", unit: "hr", qty: FT.hoursQty(t) / 1000, rate_cents: prev ? prev.rate : 0, taxable: false, discount_pct: 0 });
+        changed(true);
+        var hm2 = $("day-msg"); if (hm2) hm2.className = "msg"; if (hm2) hm2.textContent = prev ? "Labor rate " + FT.formatMoney(prev.rate) + " / hr from your last labor line (" + prev.number + "). Change it on the line if this job differs." : "Enter the hourly labor rate on the new line.";
+        var r = $("it-" + (d.items.length - 1) + "-rate"); if (r) r.focus();
+      }, null)
+    ]));
+    p.appendChild(hm);
+
+    p.appendChild(el("h3", { text: "Signatures" }));
+    p.appendChild(el("p", { class: "hint", text: "Sign with a finger or mouse. A drawn signature is a picture, not a verified e-signature." }));
+    p.appendChild(el("div", { class: "sigs" }, [
+      sigPad("sig-company", "Company representative", o, "sig_company", "sig_company_name"),
+      sigPad("sig-crew", "Crew lead", o, "sig_crew", "sig_crew_name")
+    ]));
+    return p;
+  }
+
+  function sigPad(id, label, o, key, nameKey) {
+    var W = 600, H = 180;
+    var c = el("canvas", { id: id, class: "sig", width: W, height: H, role: "img", "aria-labelledby": id + "-lbl" });
+    var ctx = c.getContext("2d");
+    var m = el("p", { class: "msg", "aria-live": "polite" });
+    function paint() {
+      ctx.clearRect(0, 0, W, H);
+      if (o[key]) {
+        var img = new Image();
+        img.addEventListener("load", function () { ctx.drawImage(img, 0, 0, W, H); });
+        img.src = o[key];
+      }
+    }
+    paint();
+    var drawing = false, last = null, dirty = false;
+    function pos(e) { var r = c.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; }
+    c.addEventListener("pointerdown", function (e) {
+      drawing = true; last = pos(e); dirty = true;
+      try { c.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      ctx.fillStyle = "#14202b"; ctx.beginPath(); ctx.arc(last[0], last[1], 1.4, 0, Math.PI * 2); ctx.fill();
+      e.preventDefault();
+    });
+    c.addEventListener("pointermove", function (e) {
+      if (!drawing) return;
+      var q = pos(e);
+      ctx.strokeStyle = "#14202b"; ctx.lineWidth = 2.6; ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+      last = q;
+      e.preventDefault();
+    });
+    function end() {
+      if (!drawing) return;
+      drawing = false;
+      if (!dirty) return;
+      var url = c.toDataURL("image/png");
+      if (url.length > FT.SIG_MAX_CHARS) { m.className = "msg bad"; m.textContent = "That signature is too detailed to store. Clear it and sign again."; return; }
+      o[key] = url; m.textContent = "";
+      changed(false);
+    }
+    c.addEventListener("pointerup", end);
+    c.addEventListener("pointercancel", end);
+    c.addEventListener("pointerleave", end);
+    return el("div", { class: "stack" }, [
+      el("label", { id: id + "-lbl", for: id, class: "lbl", text: label + " signature" }),
+      c,
+      textField(id + "-name", label + " name", o[nameKey], function (v) { o[nameKey] = v; }, { max: 120 }),
+      el("div", { class: "row" }, [btn(id + "-clear", "Clear signature", function () { o[key] = ""; paint(); changed(false); }, "quiet")]),
+      m
+    ]);
+  }
+
+  // The rate on the most recent "Labor" hour line in any other document, so a repeat job needs no typing.
+  function lastLaborRate(d) {
+    var best = null;
+    S.docs.forEach(function (x) {
+      if (x === d) return;
+      x.items.forEach(function (it) {
+        if (/^labor$/i.test(it.name.trim()) && it.unit === "hr" && it.rate_cents > 0 && (!best || x.issue_date >= best.date))
+          best = { rate: it.rate_cents, number: x.number, date: x.issue_date };
+      });
+    });
+    return best;
+  }
+
+  function itemsPanel(d) {
+    var p = el("section", { class: "panel", "aria-labelledby": "it-h" }, [el("h3", { id: "it-h", text: "Line items" })]);
+    var list = el("div", { class: "items" });
+    refs.itemAmt = [];
+    d.items.forEach(function (it, i) {
+      var pre = "it-" + i;
+      var amt = el("output", { id: pre + "-amt", class: "amt" });
+      refs.itemAmt.push(amt);
+      // Apply a qty or rate only if the line stays under the line cap.
+      var guard = function (k) {
+        return function (v) {
+          var trial = FT.clone(it); trial[k] = v;
+          FT.lineTotals(trial, "This line");
+          it[k] = v;
+        };
+      };
+      var taxable = el("input", { type: "checkbox", id: pre + "-tax", checked: it.taxable });
+      taxable.addEventListener("change", function () { it.taxable = taxable.checked; changed(false); });
+      list.appendChild(el("div", { class: "item" }, [
+        el("div", { class: "item-head" }, [el("span", { class: "lbl", text: "Line " + (i + 1) }),
+          el("span", { class: "row" }, [
+            i > 0 ? btn(pre + "-up", "Move up", function () { var x = d.items.splice(i, 1)[0]; d.items.splice(i - 1, 0, x); changed(true); }, "quiet") : null,
+            btn(pre + "-rm", "Remove", function () { d.items.splice(i, 1); changed(true); }, "quiet")])]),
+        textField(pre + "-name", "Description", it.name, function (v) { it.name = v; }, { max: 200 }),
+        el("div", { class: "grid4" }, [
+          field(pre + "-qty", "Qty", numInput(pre + "-qty", qtyText(it.qty), decParse("Qty", 3, FT.MAX_QTY * 1000), guard("qty"))),
+          textField(pre + "-unit", "Unit", it.unit, function (v) { it.unit = v; }, { max: 20, placeholder: "hr, ea, bbl" }),
+          field(pre + "-rate", "Rate ($)", numInput(pre + "-rate", FT.centsPlain(it.rate_cents), moneyParse("Rate"), guard("rate_cents"))),
+          field(pre + "-disc", "Discount (%)", numInput(pre + "-disc", pctText(it.discount_pct, 2), decParse("Discount", 2, 10000), function (v) { it.discount_pct = v; }))
+        ]),
+        el("div", { class: "foot" }, [el("label", { class: "check", for: pre + "-tax" }, [taxable, el("span", { text: "Taxable" })]),
+          el("span", {}, [el("span", { class: "lbl", text: "Amount " }), amt])])
+      ]));
+    });
+    if (!d.items.length) list.appendChild(el("p", { class: "hint", text: "No line items yet." }));
+    p.appendChild(list);
+    var m = el("p", { class: "msg bad", "aria-live": "polite" });
+    var add = function (it) {
+      if (d.items.length >= FT.MAX_ITEMS) { m.textContent = "A document holds at most " + FT.MAX_ITEMS + " line items."; return; }
+      d.items.push(it); changed(true);
+      var q = $("it-" + (d.items.length - 1) + (it.name ? "-qty" : "-name")); if (q) q.focus();
+    };
+    var row = el("div", { class: "row" });
+    if (S.catalog.length) {
+      var sel = el("select", { id: "it-catalog" }, [el("option", { value: "", text: "Add from catalog" })].concat(
+        S.catalog.map(function (c) { return el("option", { value: c.id, text: c.name + " (" + FT.formatMoney(c.rate_cents) + (c.unit ? " / " + c.unit : "") + ")" }); })));
+      sel.addEventListener("change", function () {
+        var c = S.catalog.filter(function (x) { return x.id === sel.value; })[0];
+        if (c) add({ name: c.name, unit: c.unit, qty: 1, rate_cents: c.rate_cents, taxable: c.taxable, discount_pct: 0 });
+      });
+      p.appendChild(field("it-catalog", "Catalog", sel));
+    }
+    row.appendChild(btn("it-add", "Add blank line", function () { add({ name: "", unit: "", qty: 1, rate_cents: 0, taxable: false, discount_pct: 0 }); }, null));
+    p.appendChild(row);
+    p.appendChild(m);
+    return p;
+  }
+
+  function pricingPanel(d) {
+    var p = el("section", { class: "panel", "aria-labelledby": "pr-h" }, [el("h3", { id: "pr-h", text: "Discount, tax, and payments" })]);
+    var g = el("div", { class: "fields" });
+    g.appendChild(seg("pr-dkind", "Document discount", [["pct", "Percent"], ["amt", "Dollar amount"]], d.discount_kind, function (k) {
+      if (k === d.discount_kind) return;
+      d.discount_kind = k; d.discount_value = 0; changed(true);
+    }));
+    if (d.discount_kind === "pct") {
+      g.appendChild(field("pr-dval", "Discount (%)", numInput("pr-dval", pctText(d.discount_value, 2), decParse("Discount", 2, 10000), function (v) { d.discount_value = v; })));
+    } else {
+      g.appendChild(field("pr-dval", "Discount ($)", numInput("pr-dval", FT.centsPlain(d.discount_value), moneyParse("Discount"), function (v) { d.discount_value = v; })));
+    }
+    g.appendChild(field("pr-tax", "Tax rate (%)", numInput("pr-tax", pctText(d.tax_rate_pct, 3), decParse("Tax rate", 3, 100000), function (v) { d.tax_rate_pct = v; })));
+    g.appendChild(seg("pr-tmode", "Round tax", [["document", "Once per document"], ["line", "Per line"]], d.tax_mode, function (k) { d.tax_mode = k; changed(true); }));
+    g.appendChild(textField("pr-ship-label", "Extra charge label", d.shipping_label, function (v) { d.shipping_label = v; }, { max: 60 }));
+    g.appendChild(field("pr-ship", "Shipping / mileage ($)", numInput("pr-ship", FT.centsPlain(d.shipping_cents), moneyParse("Shipping"), function (v) { d.shipping_cents = v; })));
+    g.appendChild(field("pr-dep", "Deposit received ($)", numInput("pr-dep", FT.centsPlain(d.deposit_cents), moneyParse("Deposit"), function (v) { d.deposit_cents = v; })));
+    p.appendChild(g);
+    p.appendChild(el("p", { class: "hint", text: "Tax applies to taxable lines after discounts. Shipping and mileage are not taxed." }));
+
+    if (d.type === "invoice" || d.payments.length) {
+      p.appendChild(el("h3", { text: "Payments received" }));
+      var pays = el("div", { class: "pays" });
+      d.payments.forEach(function (pay, i) {
+        var pre = "pay-" + i;
+        var date = el("input", { type: "date", id: pre + "-date", value: pay.date, min: "1900-01-01", max: "2999-12-31" });
+        date.addEventListener("change", function () { try { if (date.value) FT.parseDate(date.value, "Date"); pay.date = date.value; changed(false); } catch (e) { /* keep */ } });
+        pays.appendChild(el("div", { class: "pay" }, [
+          el("div", { class: "grid3" }, [
+            field(pre + "-date", "Date", date),
+            field(pre + "-amt", "Amount ($)", numInput(pre + "-amt", FT.centsPlain(pay.amount_cents), moneyParse("Amount"), function (v) { pay.amount_cents = v; })),
+            textField(pre + "-note", "Note", pay.note, function (v) { pay.note = v; }, { max: 120, placeholder: "check no." })
+          ]),
+          el("div", { class: "row" }, [btn(pre + "-rm", "Remove payment", function () { d.payments.splice(i, 1); changed(true); }, "quiet")])
+        ]));
+      });
+      p.appendChild(pays);
+      p.appendChild(el("div", { class: "row" }, [btn("pay-add", "Add payment", function () {
+        if (d.payments.length >= FT.MAX_PAYMENTS) return;
+        d.payments.push({ date: todayStr(), amount_cents: 0, note: "" }); changed(true);
+        var a = $("pay-" + (d.payments.length - 1) + "-amt"); if (a) { a.focus(); a.select(); }
+      }, null)]));
+    }
+
+    p.appendChild(el("h3", { text: "Totals" }));
+    refs.totals = el("div", { class: "scroll", id: "totals" });
+    p.appendChild(refs.totals);
+    p.appendChild(textField("ed-notes", "Notes on the document", d.notes, function (v) { d.notes = v; }, { max: 2000, multiline: true }));
+    return p;
+  }
+
+  function actionsPanel(d) {
+    var p = el("section", { class: "panel", "aria-labelledby": "ac-h" }, [el("h3", { id: "ac-h", text: "Next step" })]);
+    var m = el("p", { class: "msg bad", "aria-live": "polite" });
+    var row = el("div", { class: "row" });
+    if (d.type === "estimate" && !d.converted_to) {
+      row.appendChild(btn("ac-convert", "Convert to invoice", function () {
+        try {
+          var inv = FT.estimateToInvoice(d, newId(), FT.formatDocNumber(S.settings.prefix.invoice, S.settings.next.invoice), todayStr());
+          inv.example = false;
+          nextNumber("invoice");
+          d.converted_to = inv.number;
+          S.docs.push(inv); scheduleSave(); go("doc", inv.id);
+        } catch (e) { m.textContent = errText(e); }
+      }, "primary"));
+    }
+    if (d.type === "ticket" && !d.converted_to) {
+      row.appendChild(btn("ac-convert", "Invoice this ticket", function () {
+        try {
+          var inv = FT.ticketsToInvoice([d], newId(), FT.formatDocNumber(S.settings.prefix.invoice, S.settings.next.invoice), todayStr());
+          inv.example = false; inv.terms = S.business.terms;
+          nextNumber("invoice");
+          d.converted_to = inv.number;
+          S.docs.push(inv); scheduleSave(); go("doc", inv.id);
+        } catch (e) { m.textContent = errText(e); }
+      }, "primary"));
+      row.appendChild(btn("ac-bundle", "Bundle with other tickets", function () {
+        // Pick every open ticket for the same customer; the user can untick any of them.
+        ui.bundle = true; ui.picked = {}; ui.filter = "ticket";
+        var key = FT.customerKey(d.customer.name), n = 0;
+        S.docs.forEach(function (x) {
+          if (x.type === "ticket" && !x.converted_to && (x === d || (key && FT.customerKey(x.customer.name) === key))) { ui.picked[x.id] = true; n++; }
+        });
+        ui.bundleWhy = n > 1 ? "Picked the " + n + " open tickets for " + (d.customer.name.trim() || "this customer") + ". Untick any you want to leave out." : "";
+        go("docs");
+      }, null));
+    }
+    row.appendChild(btn("ac-dup", "Duplicate", function () {
+      var c = FT.clone(d);
+      c.id = newId(); c.number = nextNumber(d.type); c.status = "draft"; c.issue_date = todayStr(); c.payments = [];
+      c.sources = []; c.converted_to = ""; c.example = false; c.oil.sig_company = ""; c.oil.sig_crew = "";
+      S.docs.push(c); scheduleSave(); go("doc", c.id);
+    }, null));
+    var host = el("div", {});
+    row.appendChild(btn("ac-delete", "Delete", function () {
+      host.replaceChildren(confirmBox("Delete " + FT.TYPE_LABEL[d.type] + " " + d.number + "? This cannot be undone.", "Delete", function () {
+        S.docs = S.docs.filter(function (x) { return x !== d; });
+        // An invoice that is deleted frees its source documents to be converted again.
+        S.docs.forEach(function (x) { if (d.type === "invoice" && x.converted_to === d.number && d.sources.indexOf(x.number) >= 0) x.converted_to = ""; });
+        scheduleSave(); go("docs");
+      }));
+    }, "danger"));
+    p.appendChild(row);
+    p.appendChild(host);
+    p.appendChild(m);
+    if (d.type !== "invoice") p.appendChild(el("p", { class: "hint", text: "Converting copies the line items, pricing, tax, and oilfield details into a new draft invoice that names this document as its source." }));
+    return p;
+  }
+
+  function outputPanel(d) {
+    var p = el("section", { class: "panel", "aria-labelledby": "out-h" }, [el("h3", { id: "out-h", text: "PDF and preview" })]);
+    var note = el("p", { class: "msg", id: "pdf-note", "aria-live": "polite" });
+    p.appendChild(el("div", { class: "row" }, [btn("pdf-download", "Download PDF", function () { downloadPdf(d, note); }, "primary")]));
+    p.appendChild(note);
+    refs.preview = el("div", { id: "preview", "aria-label": "Document preview" });
+    p.appendChild(refs.preview);
+    return p;
+  }
+
+  function scheduleRefresh() { clearTimeout(refreshTimer); refreshTimer = setTimeout(refresh, 120); }
+
+  function refresh() {
+    clearTimeout(refreshTimer);
+    var d = ui.view === "doc" ? findDoc(ui.docId) : null;
+    if (!d || !refs.totals) return;
+    var today = todayStr();
+    refs.chip.replaceChildren(chip(safeStatus(d, today)));
+    if (refs.due) refs.due.textContent = FT.dueDate(d.issue_date, d.terms) + "  (" + FT.TERMS_LABEL[d.terms] + ")";
+    if (refs.dayHours) {
+      d.oil.days.forEach(function (day, i) {
+        var o = refs.dayHours[i]; if (!o) return;
+        try { o.textContent = day.start && day.end ? FT.formatHours(FT.shiftMinutes(day.start, day.end)) + " h" : "enter start and end"; }
+        catch (e) { o.textContent = "check times"; }
+      });
+      try { refs.totalHours.textContent = FT.formatHours(FT.ticketMinutes(d.oil.days).total) + " h"; } catch (e) { refs.totalHours.textContent = "check times"; }
+    }
+    var t;
+    try { t = FT.computeTotals(d); } catch (e) {
+      refs.totals.replaceChildren(el("p", { class: "msg bad", text: errText(e) }));
+      return;
+    }
+    (refs.itemAmt || []).forEach(function (o, i) {
+      var ln = t.lines[i]; if (!ln) return;
+      o.textContent = FT.formatMoney(ln.net) + (ln.line_discount ? " (after " + FT.formatMoney(ln.line_discount) + " off)" : "");
+    });
+    var tb = el("tbody");
+    totalRows(d, t).forEach(function (r) {
+      tb.appendChild(el("tr", { class: r[2] ? "strong" : "" }, [el("td", { text: r[0] }), el("td", { class: "n", text: FT.formatMoney(r[1]) })]));
+    });
+    refs.totals.replaceChildren(el("table", { "aria-label": "Totals" }, [tb]));
+    refs.preview.replaceChildren(buildPreview(d, t));
+  }
+
+  function totalRows(d, t) {
+    var r = [["Subtotal", t.subtotal]];
+    if (t.discount) r.push([d.discount_kind === "pct" ? "Discount (" + pctText(d.discount_value, 2) + "%)" : "Discount", -t.discount]);
+    if (t.tax || d.tax_rate_pct) r.push(["Tax (" + pctText(d.tax_rate_pct, 3) + "%" + (d.tax_mode === "line" ? ", rounded per line" : "") + ")", t.tax]);
+    if (t.shipping) r.push([d.shipping_label || "Shipping / mileage", t.shipping]);
+    r.push(["Total", t.total, true]);
+    if (t.deposit) r.push(["Deposit received", -t.deposit]);
+    if (t.payments) r.push(["Payments received", -t.payments]);
+    if (d.type === "invoice" || t.paid) r.push([t.balance < 0 ? "Credit" : "Balance due", t.balance, true]);
+    return r;
+  }
+  function oilRows(o) {
+    var rows = [["Operator", o.operator], ["AFE", o.afe], ["Lease", o.lease], ["Well", o.well], ["Rig", o.rig],
+      ["County / State", [o.county, o.state].filter(Boolean).join(", ")], ["PO", o.po], ["Crew", o.crew]];
+    return rows.filter(function (r) { return r[1]; });
+  }
+  function metaRows(d) {
+    var m = [["Number", d.number], ["Date", d.issue_date]];
+    if (d.type === "invoice") { m.push(["Due", FT.dueDate(d.issue_date, d.terms)]); m.push(["Terms", FT.TERMS_LABEL[d.terms]]); }
+    if (d.sources.length) m.push([d.sources.length > 1 ? "Sources" : "Source", d.sources.join(", ")]);
+    return m;
+  }
+
+  // ------------------------------------------------------------ preview (HTML, paper colors)
+  function buildPreview(d, t) {
+    var b = S.business;
+    var paper = el("article", { class: "paper" });
+    var biz = el("div", { class: "p-biz" });
+    if (b.logo) biz.appendChild(el("img", { src: b.logo, alt: "Logo" }));
+    biz.appendChild(el("span", { class: "p-name", text: b.name || "Your business name" }));
+    [b.address, b.phone, b.email, b.tax_id].forEach(function (s) { if (s) biz.appendChild(el("span", { class: "p-sub", text: s })); });
+    var meta = el("div", { class: "p-meta" });
+    metaRows(d).forEach(function (r) { meta.appendChild(el("span", { text: r[0] })); meta.appendChild(el("span", { text: r[1] })); });
+    paper.appendChild(el("div", { class: "p-head" }, [biz, el("div", { class: "stack" }, [el("div", { class: "p-title", text: FT.TYPE_LABEL[d.type] }), meta])]));
+
+    var c = d.customer;
+    var who = el("div", {}, [el("div", { class: "p-label", text: d.type === "estimate" ? "Prepared for" : "Bill to" })]);
+    [c.name, c.contact, c.address, c.phone, c.email].forEach(function (s, i) { if (s) who.appendChild(el("div", { class: i === 0 ? "p-name" : "p-sub", text: s })); });
+    paper.appendChild(who);
+    if (d.oil.enabled) {
+      var kv = el("div", { class: "p-kv" });
+      oilRows(d.oil).forEach(function (r) { kv.appendChild(el("div", {}, [el("span", { class: "p-label", text: r[0] }), el("span", { text: r[1] })])); });
+      if (kv.childNodes.length) paper.appendChild(kv);
+    }
+
+    var tb = el("tbody");
+    d.items.forEach(function (it, i) {
+      var ln = t.lines[i];
+      tb.appendChild(el("tr", {}, [
+        el("td", { class: "desc", text: it.name + (it.taxable ? "  (T)" : "") }),
+        el("td", { class: "n", text: qtyText(it.qty) }), el("td", { text: it.unit }),
+        el("td", { class: "n", text: FT.formatMoney(it.rate_cents) }),
+        el("td", { class: "n", text: it.discount_pct ? pctText(it.discount_pct, 2) + "%" : "" }),
+        el("td", { class: "n", text: FT.formatMoney(ln.net) })
+      ]));
+    });
+    if (!d.items.length) tb.appendChild(el("tr", {}, [el("td", { colspan: 6, text: "No line items." })]));
+    paper.appendChild(el("div", { class: "scroll" }, [el("table", {}, [
+      el("thead", {}, [el("tr", {}, ["Description", "Qty", "Unit", "Rate", "Disc", "Amount"].map(function (h, i) {
+        return el("th", { class: i === 0 || i === 2 ? "" : "n", scope: "col", text: h });
+      }))]), tb])]));
+    if (d.items.some(function (it) { return it.taxable; })) paper.appendChild(el("p", { class: "p-sub", text: "(T) taxable line" }));
+
+    var tt = el("tbody");
+    totalRows(d, t).forEach(function (r) { tt.appendChild(el("tr", { class: r[2] ? "strong" : "" }, [el("td", { text: r[0] }), el("td", { class: "n", text: FT.formatMoney(r[1]) })])); });
+    paper.appendChild(el("div", { class: "p-totals" }, [el("table", {}, [tt])]));
+
+    if (d.oil.enabled && d.oil.days.length) {
+      var dt = el("tbody");
+      var mins = FT.ticketMinutes(d.oil.days);
+      d.oil.days.forEach(function (day, i) {
+        dt.appendChild(el("tr", {}, [el("td", { class: "n", text: day.date }), el("td", { class: "n", text: day.start }), el("td", { class: "n", text: day.end }),
+          el("td", { class: "n", text: mins.days[i] === null ? "" : FT.formatHours(mins.days[i]) }), el("td", { class: "desc", text: day.note })]));
+      });
+      dt.appendChild(el("tr", { class: "strong" }, [el("td", { colspan: 3, text: "Total hours" }), el("td", { class: "n", text: FT.formatHours(mins.total) }), el("td")]));
+      paper.appendChild(el("div", {}, [el("div", { class: "p-label", text: "Time" }), el("div", { class: "scroll" }, [el("table", {}, [
+        el("thead", {}, [el("tr", {}, ["Date", "Start", "End", "Hours", "Work done"].map(function (h, i) { return el("th", { class: i < 4 ? "n" : "", scope: "col", text: h }); }))]), dt])])]));
+    }
+    if (d.oil.enabled) {
+      var sig = function (url, label, name) {
+        return el("div", {}, [el("div", { class: "p-sig" }, [url ? el("img", { src: url, alt: label + " signature" }) : null]),
+          el("div", { class: "p-sub", text: label + (name ? ": " + name : "") })]);
+      };
+      paper.appendChild(el("div", { class: "p-sigs" }, [sig(d.oil.sig_company, "Company representative", d.oil.sig_company_name), sig(d.oil.sig_crew, "Crew lead", d.oil.sig_crew_name)]));
+    }
+    if (d.notes) paper.appendChild(el("div", {}, [el("div", { class: "p-label", text: "Notes" }), el("div", { class: "p-note", text: d.notes })]));
+    if (d.type === "invoice" && b.payment_instructions) paper.appendChild(el("div", {}, [el("div", { class: "p-label", text: "How to pay" }), el("div", { class: "p-note", text: b.payment_instructions })]));
+    return paper;
+  }
+
+  // ------------------------------------------------------------ PDF (jsPDF text and image calls only)
+  var LATIN1 = { "\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"', "\u2013": "-", "\u2014": "-", "\u2026": "...", "\u2022": "*", "\u2122": "TM" };
+  function pdfText(s) {
+    return String(s).replace(/[\u2018\u2019\u201c\u201d\u2013\u2014\u2026\u2022\u2122]/g, function (ch) { return LATIN1[ch]; })
+      .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "?").replace(/[^\x0a\x20-\x7e\xa0-\xff]/g, "?");
+  }
+  function imgFormat(url) { return url.indexOf("data:image/jpeg") === 0 ? "JPEG" : "PNG"; }
+
+  function buildPdf(d) {
+    var t = FT.computeTotals(d);
+    var b = S.business;
+    var pdf = new window.jspdf.jsPDF({ unit: "pt", format: "letter", compress: true });
+    var PW = 612, PH = 792, M = 40, CW = PW - 2 * M, BOTTOM = PH - 50;
+    var INK = [20, 32, 43], MUTED = [84, 98, 113], LINE = [201, 209, 218], BAND = [227, 232, 238], ACCENT = [11, 107, 120];
+    var y = M;
+    function color(c) { pdf.setTextColor(c[0], c[1], c[2]); }
+    function font(style, size) { pdf.setFont("helvetica", style); pdf.setFontSize(size); }
+    function txt(s, x, yy, opts) { pdf.text(pdfText(s), x, yy, opts || {}); }
+    function wrap(s, w) { return pdf.splitTextToSize(pdfText(s), w); }
+    function need(h) { if (y + h > BOTTOM) { pdf.addPage(); y = M; return true; } return false; }
+
+    // Header: logo and business on the left, title and meta on the right.
+    var leftY = y;
+    if (b.logo) {
+      try {
+        var ip = pdf.getImageProperties(b.logo);
+        var sc = Math.min(150 / ip.width, 56 / ip.height, 1);
+        pdf.addImage(b.logo, imgFormat(b.logo), M, leftY, ip.width * sc, ip.height * sc);
+        leftY += ip.height * sc + 8;
+      } catch (e) { /* skip a logo jsPDF cannot read */ }
+    }
+    font("bold", 13); color(INK);
+    wrap(b.name || "Your business name", 280).forEach(function (l) { leftY += 13; txt(l, M, leftY); });
+    font("normal", 9); color(MUTED);
+    [b.address, b.phone, b.email, b.tax_id].forEach(function (s) {
+      if (!s) return;
+      wrap(s, 280).forEach(function (l) { leftY += 11; txt(l, M, leftY); });
+    });
+    var rightY = y + 20;
+    font("bold", 22); color(ACCENT);
+    txt(FT.TYPE_LABEL[d.type].toUpperCase(), PW - M, rightY, { align: "right" });
+    rightY += 8;
+    metaRows(d).forEach(function (r) {
+      rightY += 12;
+      font("normal", 9); color(MUTED); txt(r[0], PW - M - 110, rightY, { align: "right" });
+      font("bold", 9); color(INK);
+      wrap(r[1], 102).forEach(function (l, i) { if (i) rightY += 11; txt(l, PW - M, rightY, { align: "right" }); });
+    });
+    y = Math.max(leftY, rightY) + 18;
+    pdf.setDrawColor(LINE[0], LINE[1], LINE[2]); pdf.setLineWidth(0.8); pdf.line(M, y, PW - M, y);
+    y += 18;
+
+    // Bill to, and oilfield header fields beside it.
+    var c = d.customer;
+    var billY = y;
+    font("bold", 8); color(MUTED); txt(d.type === "estimate" ? "PREPARED FOR" : "BILL TO", M, billY);
+    [c.name, c.contact, c.address, c.phone, c.email].forEach(function (s, i) {
+      if (!s) return;
+      font(i === 0 ? "bold" : "normal", i === 0 ? 11 : 9); color(i === 0 ? INK : MUTED);
+      wrap(s, 230).forEach(function (l) { billY += i === 0 ? 14 : 11; txt(l, M, billY); });
+    });
+    var oilY = y;
+    if (d.oil.enabled) {
+      var ox = M + 260, col = 0, rows = oilRows(d.oil), rowTop = oilY;
+      rows.forEach(function (r) {
+        var x = ox + col * 136, ww = r[0] === "Crew" ? 272 : 128;
+        if (r[0] === "Crew" && col === 1) { col = 0; rowTop += 26; x = ox; }
+        font("bold", 7.5); color(MUTED); txt(r[0].toUpperCase(), x, rowTop);
+        font("normal", 9); color(INK);
+        var ls = wrap(r[1], ww).slice(0, 3);
+        ls.forEach(function (l, i) { txt(l, x, rowTop + 11 + i * 10); });
+        var h = 14 + ls.length * 10;
+        if (r[0] === "Crew") { rowTop += h; col = 0; return; }
+        if (col === 1) { rowTop += Math.max(h, 26); col = 0; } else col = 1;
+      });
+      oilY = rowTop + (col === 1 ? 26 : 0);
+    }
+    y = Math.max(billY, oilY) + 22;
+
+    // Line items.
+    var cols = [
+      { h: "Description", w: CW - 55 - 40 - 75 - 45 - 85, a: "left" }, { h: "Qty", w: 55, a: "right" }, { h: "Unit", w: 40, a: "left" },
+      { h: "Rate", w: 75, a: "right" }, { h: "Disc", w: 45, a: "right" }, { h: "Amount", w: 85, a: "right" }
+    ];
+    function tableHead(defs) {
+      pdf.setFillColor(BAND[0], BAND[1], BAND[2]); pdf.rect(M, y, CW, 18, "F");
+      font("bold", 8); color(MUTED);
+      var x = M;
+      defs.forEach(function (cd) { txt(cd.h.toUpperCase(), cd.a === "right" ? x + cd.w - 5 : x + 5, y + 12, cd.a === "right" ? { align: "right" } : {}); x += cd.w; });
+      y += 18;
+    }
+    function tableRow(defs, cells, opts) {
+      opts = opts || {};
+      font(opts.bold ? "bold" : "normal", 9);
+      var lines = cells.map(function (s, i) { return defs[i].a === "left" ? wrap(s, defs[i].w - 10) : [pdfText(s)]; });
+      var n = Math.max.apply(null, lines.map(function (l) { return l.length; }));
+      var h = n * 11 + 8;
+      if (need(h)) tableHead(defs);
+      font(opts.bold ? "bold" : "normal", 9); color(INK);
+      var x = M;
+      defs.forEach(function (cd, i) {
+        lines[i].forEach(function (l, k) { txt(l, cd.a === "right" ? x + cd.w - 5 : x + 5, y + 13 + k * 11, cd.a === "right" ? { align: "right" } : {}); });
+        x += cd.w;
+      });
+      y += h;
+      pdf.setDrawColor(LINE[0], LINE[1], LINE[2]); pdf.setLineWidth(0.5); pdf.line(M, y, PW - M, y);
+    }
+    need(40);
+    tableHead(cols);
+    d.items.forEach(function (it, i) {
+      tableRow(cols, [it.name + (it.taxable ? "  (T)" : ""), qtyText(it.qty), it.unit, FT.formatMoney(it.rate_cents),
+        it.discount_pct ? pctText(it.discount_pct, 2) + "%" : "", FT.formatMoney(t.lines[i].net)]);
+    });
+    if (!d.items.length) tableRow(cols, ["No line items.", "", "", "", "", ""]);
+    y += 6;
+    if (d.items.some(function (it) { return it.taxable; })) { font("normal", 8); color(MUTED); txt("(T) taxable line", M, y + 8); }
+
+    // Totals, right aligned.
+    var tr = totalRows(d, t);
+    need(tr.length * 15 + 10);
+    tr.forEach(function (r) {
+      y += 15;
+      font(r[2] ? "bold" : "normal", r[2] ? 11 : 9.5); color(r[2] ? INK : MUTED);
+      txt(r[0], PW - M - 110, y, { align: "right" });
+      color(INK); txt(FT.formatMoney(r[1]), PW - M, y, { align: "right" });
+      if (r[2]) { pdf.setDrawColor(LINE[0], LINE[1], LINE[2]); pdf.line(PW - M - 250, y - 12, PW - M, y - 12); }
+    });
+    y += 22;
+
+    // Oilfield time and signatures.
+    if (d.oil.enabled && d.oil.days.length) {
+      need(60);
+      font("bold", 8); color(MUTED); txt("TIME", M, y); y += 6;
+      var dcols = [{ h: "Date", w: 80, a: "left" }, { h: "Start", w: 55, a: "right" }, { h: "End", w: 55, a: "right" }, { h: "Hours", w: 60, a: "right" },
+        { h: "Work done", w: CW - 250, a: "left" }];
+      tableHead(dcols);
+      var mins = FT.ticketMinutes(d.oil.days);
+      d.oil.days.forEach(function (day, i) {
+        tableRow(dcols, [day.date, day.start, day.end, mins.days[i] === null ? "" : FT.formatHours(mins.days[i]), day.note]);
+      });
+      tableRow(dcols, ["Total hours", "", "", FT.formatHours(mins.total), ""], { bold: true });
+      y += 16;
+    }
+    if (d.oil.enabled) {
+      need(100);
+      var sw = (CW - 30) / 2;
+      [[d.oil.sig_company, "Company representative", d.oil.sig_company_name], [d.oil.sig_crew, "Crew lead", d.oil.sig_crew_name]].forEach(function (s, i) {
+        var x = M + i * (sw + 30);
+        if (s[0]) { try { pdf.addImage(s[0], "PNG", x, y, 200, 60); } catch (e) { /* skip */ } }
+        pdf.setDrawColor(INK[0], INK[1], INK[2]); pdf.setLineWidth(0.8); pdf.line(x, y + 64, x + sw, y + 64);
+        font("normal", 8.5); color(MUTED); txt(s[1] + (s[2] ? ": " + s[2] : ""), x, y + 76);
+      });
+      y += 96;
+    }
+    function block(label, text) {
+      if (!text) return;
+      font("normal", 9);
+      var ls = wrap(text, CW);
+      need(24);
+      font("bold", 8); color(MUTED); txt(label, M, y); y += 4;
+      font("normal", 9); color(INK);
+      ls.forEach(function (l) { need(12); y += 12; txt(l, M, y); });
+      y += 16;
+    }
+    block("NOTES", d.notes);
+    if (d.type === "invoice") block("HOW TO PAY", b.payment_instructions);
+
+    var pages = pdf.getNumberOfPages();
+    for (var i = 1; i <= pages; i++) {
+      pdf.setPage(i);
+      font("normal", 8); color(MUTED);
+      txt((b.name ? b.name + "   " : "") + FT.TYPE_LABEL[d.type] + " " + d.number, M, PH - 28);
+      txt("Page " + i + " of " + pages, PW - M, PH - 28, { align: "right" });
+    }
+    return pdf;
+  }
+
+  function downloadPdf(d, note) {
+    note.className = "msg";
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      note.className = "msg bad";
+      note.textContent = "The PDF library did not load (offline, or blocked by this viewer). The preview below shows the same document.";
+      return;
+    }
+    var pdf;
+    try { pdf = buildPdf(d); } catch (e) { note.className = "msg bad"; note.textContent = "Could not build the PDF: " + errText(e); return; }
+    var name = ((d.number || FT.TYPE_LABEL[d.type]).replace(/[^A-Za-z0-9_-]+/g, "-") || "document") + ".pdf";
+    var framed = false;
+    try { framed = window.self !== window.top; } catch (e) { framed = true; }
+    try { pdf.save(name); } catch (e) {
+      note.className = "msg bad";
+      note.textContent = "This viewer blocks downloads. Download PDF works on the GitHub version; the preview below matches the PDF.";
+      return;
+    }
+    note.textContent = framed
+      ? "If no file appeared, this viewer blocks downloads. Download PDF works on the GitHub version; the preview below matches the PDF."
+      : "Saved " + name + " to your downloads.";
+  }
+
+  // ------------------------------------------------------------ business
+  function renderBusiness(view) {
+    var b = S.business;
+    var p = el("section", { class: "panel", "aria-labelledby": "bz-h" }, [el("h2", { id: "bz-h", text: "Business profile" }),
+      el("p", { class: "hint", text: "Printed at the top of every document. New documents start with these tax and terms settings." })]);
+    var g = el("div", { class: "fields" });
+    g.appendChild(textField("bz-name", "Business name", b.name, function (v) { b.name = v; }, { max: 120 }));
+    g.appendChild(textField("bz-taxid", "License / tax ID", b.tax_id, function (v) { b.tax_id = v; }, { max: 80 }));
+    g.appendChild(textField("bz-address", "Address", b.address, function (v) { b.address = v; }, { max: 400, multiline: true, wide: true }));
+    g.appendChild(textField("bz-phone", "Phone", b.phone, function (v) { b.phone = v; }, { max: 60, type: "tel" }));
+    g.appendChild(textField("bz-email", "Email", b.email, function (v) { b.email = v; }, { max: 120, type: "email" }));
+    p.appendChild(g);
+
+    var lm = el("p", { class: "msg", "aria-live": "polite" });
+    var file = el("input", { type: "file", id: "bz-logo", accept: "image/png,image/jpeg,image/webp,image/gif" });
+    file.addEventListener("change", function () { onLogo(file.files && file.files[0], lm); file.value = ""; });
+    var logoBox = el("div", { class: "stack" }, [field("bz-logo", "Logo (PNG, JPEG, WebP, or GIF, up to 2 MB)", file)]);
+    if (b.logo) {
+      logoBox.appendChild(el("div", { class: "paper" }, [el("img", { src: b.logo, alt: "Current logo", style: "max-width:200px;max-height:80px;object-fit:contain" })]));
+      logoBox.appendChild(el("div", { class: "row" }, [btn("bz-logo-rm", "Remove logo", function () { b.logo = ""; changed(true); }, "quiet")]));
+    }
+    logoBox.appendChild(lm);
+    p.appendChild(logoBox);
+    view.appendChild(p);
+
+    var q = el("section", { class: "panel", "aria-labelledby": "bz-d-h" }, [el("h3", { id: "bz-d-h", text: "Defaults" })]);
+    var g2 = el("div", { class: "fields" });
+    g2.appendChild(field("bz-tax", "Default tax rate (%)", numInput("bz-tax", pctText(b.tax_rate_pct, 3), decParse("Tax rate", 3, 100000), function (v) { b.tax_rate_pct = v; })));
+    var terms = el("select", { id: "bz-terms" }, FT.TERMS_KEYS.map(function (k) { return el("option", { value: k, text: FT.TERMS_LABEL[k] }); }));
+    terms.value = b.terms;
+    terms.addEventListener("change", function () { b.terms = terms.value; changed(false); });
+    g2.appendChild(field("bz-terms", "Default payment terms", terms));
+    g2.appendChild(seg("bz-tmode", "Round tax", [["document", "Once per document"], ["line", "Per line"]], b.tax_mode, function (k) { b.tax_mode = k; changed(true); }));
+    g2.appendChild(textField("bz-pay", "Payment instructions (printed on invoices)", b.payment_instructions, function (v) { b.payment_instructions = v; }, { max: 1000, multiline: true, wide: true }));
+    q.appendChild(g2);
+    q.appendChild(check("bz-oil", "Turn on oilfield fields for new field tickets", S.settings.oil_default, function (v) { S.settings.oil_default = v; changed(false); }));
+    view.appendChild(q);
+
+    var r = el("section", { class: "panel", "aria-labelledby": "bz-n-h" }, [el("h3", { id: "bz-n-h", text: "Numbering" }),
+      el("p", { class: "hint", text: "Each type has its own prefix and counter. The next new document takes the next number." })]);
+    var g3 = el("div", { class: "fields three" });
+    ["estimate", "ticket", "invoice"].forEach(function (k) {
+      g3.appendChild(textField("num-" + k + "-prefix", FT.TYPE_LABEL[k] + " prefix", S.settings.prefix[k], function (v) { S.settings.prefix[k] = v; }, { max: 12 }));
+      g3.appendChild(field("num-" + k + "-next", FT.TYPE_LABEL[k] + " next number", numInput("num-" + k + "-next", String(S.settings.next[k]), function (t) {
+        var v = FT.parseDecimal(t, 0, "Next number", 999999);
+        if (v < 1) throw new Error("Next number: use 1 or more.");
+        return v;
+      }, function (v) { S.settings.next[k] = v; })));
+    });
+    r.appendChild(g3);
+    view.appendChild(r);
+  }
+
+  function onLogo(f, m) {
+    m.className = "msg bad";
+    if (!f) return;
+    if (f.size > LOGO_FILE_MAX) { m.textContent = "That image is over 2 MB. Pick a smaller PNG or JPEG."; return; }
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(f.type)) { m.textContent = "Pick a PNG, JPEG, WebP, or GIF image."; return; }
+    var fr = new FileReader();
+    fr.addEventListener("error", function () { m.textContent = "Could not read that file."; });
+    fr.addEventListener("load", function () {
+      var img = new Image();
+      img.addEventListener("error", function () { m.textContent = "That file is not an image this browser can read."; });
+      img.addEventListener("load", function () {
+        var s = Math.min(1, 600 / img.naturalWidth, 240 / img.naturalHeight);
+        var w = Math.max(1, Math.round(img.naturalWidth * s)), h = Math.max(1, Math.round(img.naturalHeight * s));
+        var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+        var cx = cv.getContext("2d");
+        cx.drawImage(img, 0, 0, w, h);
+        var url = cv.toDataURL("image/png");
+        if (url.length > FT.LOGO_MAX_CHARS) {
+          cx.globalCompositeOperation = "destination-over"; cx.fillStyle = "#ffffff"; cx.fillRect(0, 0, w, h);
+          url = cv.toDataURL("image/jpeg", 0.85);
+        }
+        if (url.length > FT.LOGO_MAX_CHARS || !/^data:image\/(png|jpeg);base64,/.test(url)) { m.textContent = "That logo is still too large after shrinking. Try a simpler image."; return; }
+        S.business.logo = url;
+        changed(true);
+      });
+      img.src = fr.result;
+    });
+    fr.readAsDataURL(f);
+  }
+
+  // ------------------------------------------------------------ customers and catalog
+  function renderCustomers(view) {
+    var p = el("section", { class: "panel", "aria-labelledby": "cs-h" }, [el("h2", { id: "cs-h", text: "Customers" }),
+      el("p", { class: "hint", text: "Pick a saved customer on any document to fill in the Bill to block." })]);
+    var list = el("div", { class: "stack" });
+    S.customers.forEach(function (c, i) {
+      var pre = "cs-" + i;
+      var host = el("div", {});
+      var g = el("div", { class: "fields" });
+      g.appendChild(textField(pre + "-name", "Name", c.name, function (v) { c.name = v; }, { max: 120 }));
+      g.appendChild(textField(pre + "-contact", "Contact", c.contact, function (v) { c.contact = v; }, { max: 120 }));
+      g.appendChild(textField(pre + "-address", "Address", c.address, function (v) { c.address = v; }, { max: 400, multiline: true, wide: true }));
+      g.appendChild(textField(pre + "-phone", "Phone", c.phone, function (v) { c.phone = v; }, { max: 60, type: "tel" }));
+      g.appendChild(textField(pre + "-email", "Email", c.email, function (v) { c.email = v; }, { max: 120, type: "email" }));
+      list.appendChild(el("div", { class: "rec" }, [g, el("div", { class: "row" }, [btn(pre + "-rm", "Delete customer", function () {
+        host.replaceChildren(confirmBox("Delete " + (c.name || "this customer") + "? Documents keep their copy of the details.", "Delete", function () {
+          S.customers.splice(S.customers.indexOf(c), 1); changed(true);
+        }));
+      }, "danger")]), host]));
+    });
+    if (!S.customers.length) list.appendChild(el("p", { class: "hint", text: "No saved customers yet." }));
+    p.appendChild(list);
+    p.appendChild(el("div", { class: "row" }, [btn("cs-add", "Add customer", function () {
+      S.customers.push({ id: newId(), name: "", contact: "", address: "", phone: "", email: "" }); changed(true);
+      var n = $("cs-" + (S.customers.length - 1) + "-name"); if (n) n.focus();
+    }, "primary")]));
+    view.appendChild(p);
+  }
+
+  function renderCatalog(view) {
+    var p = el("section", { class: "panel", "aria-labelledby": "ct-h" }, [el("h2", { id: "ct-h", text: "Catalog" }),
+      el("p", { class: "hint", text: "Saved items and rates. Add them to any document from its Line items section." })]);
+    var list = el("div", { class: "stack" });
+    S.catalog.forEach(function (c, i) {
+      var pre = "ct-" + i;
+      var host = el("div", {});
+      var tax = el("input", { type: "checkbox", id: pre + "-tax", checked: c.taxable });
+      tax.addEventListener("change", function () { c.taxable = tax.checked; changed(false); });
+      list.appendChild(el("div", { class: "rec" }, [
+        textField(pre + "-name", "Item", c.name, function (v) { c.name = v; }, { max: 200 }),
+        el("div", { class: "grid3" }, [
+          textField(pre + "-unit", "Unit", c.unit, function (v) { c.unit = v; }, { max: 20 }),
+          field(pre + "-rate", "Rate ($)", numInput(pre + "-rate", FT.centsPlain(c.rate_cents), moneyParse("Rate"), function (v) { c.rate_cents = v; })),
+          el("div", { class: "field" }, [el("span", { class: "lbl", text: "Tax" }), el("label", { class: "check", for: pre + "-tax" }, [tax, el("span", { text: "Taxable" })])])
+        ]),
+        el("div", { class: "row" }, [btn(pre + "-rm", "Delete item", function () {
+          host.replaceChildren(confirmBox("Delete " + (c.name || "this item") + " from the catalog?", "Delete", function () { S.catalog.splice(S.catalog.indexOf(c), 1); changed(true); }));
+        }, "danger")]),
+        host
+      ]));
+    });
+    if (!S.catalog.length) list.appendChild(el("p", { class: "hint", text: "No catalog items yet." }));
+    p.appendChild(list);
+    p.appendChild(el("div", { class: "row" }, [btn("ct-add", "Add item", function () {
+      S.catalog.push({ id: newId(), name: "", unit: "", rate_cents: 0, taxable: false }); changed(true);
+      var n = $("ct-" + (S.catalog.length - 1) + "-name"); if (n) n.focus();
+    }, "primary")]));
+    view.appendChild(p);
+  }
+
+  // ------------------------------------------------------------ backup
+  function renderBackup(view) {
+    var p = el("section", { class: "panel", "aria-labelledby": "bk-h" }, [el("h2", { id: "bk-h", text: "Backup and move devices" }),
+      el("p", { class: "hint", text: "Everything lives only in this browser. Export all gives you one block of text holding your business, customers, catalog, and documents. Keep it in a note or email it to yourself. Import it on another phone or computer to pick up where you left off." })]);
+    var exHost = el("div", { class: "stack", id: "bk-export-host" });
+    var exMsg = el("p", { class: "msg", "aria-live": "polite" });
+    p.appendChild(el("div", { class: "row" }, [btn("bk-export", "Export all", function () {
+      flush();
+      var text = JSON.stringify(S);
+      var ta = el("textarea", { class: "mono", id: "bk-export-text", readonly: true });
+      ta.value = text;
+      exHost.replaceChildren(field("bk-export-text", "Backup (" + Math.ceil(text.length / 1024) + " KB of text)", ta),
+        el("div", { class: "row" }, [btn("bk-copy", "Copy backup", function () { copyText(text, exHost, exMsg); }, "primary"),
+          btn("bk-select", "Select all", function () { ta.focus(); ta.select(); }, null)]));
+    }, "primary")]));
+    p.appendChild(exHost);
+    p.appendChild(exMsg);
+    view.appendChild(p);
+
+    var q = el("section", { class: "panel", "aria-labelledby": "im-h" }, [el("h3", { id: "im-h", text: "Import" }),
+      el("p", { class: "hint", text: "Paste a backup or pick a backup file. Import replaces everything on this device, so export first if you need what is here." })]);
+    var ta = el("textarea", { class: "mono", id: "im-text", placeholder: "{\"app\": \"field-ticket\", ...}" });
+    var m = el("p", { class: "msg", "aria-live": "polite", id: "im-msg" });
+    var file = el("input", { type: "file", id: "im-file", accept: "application/json,.json,.txt,text/plain" });
+    file.addEventListener("change", function () {
+      var f = file.files && file.files[0];
+      file.value = "";
+      if (!f) return;
+      if (f.size > IMPORT_MAX_CHARS) { m.className = "msg bad"; m.textContent = "That file is over 20 MB, which is larger than any backup this tool writes."; return; }
+      var fr = new FileReader();
+      fr.addEventListener("load", function () { ta.value = String(fr.result).replace(/^\uFEFF/, ""); m.className = "msg"; m.textContent = "File loaded. Press Import to check and load it."; });
+      fr.addEventListener("error", function () { m.className = "msg bad"; m.textContent = "Could not read that file."; });
+      fr.readAsText(f);
+    });
+    q.appendChild(field("im-text", "Backup text", ta));
+    q.appendChild(field("im-file", "Or pick a backup file", file));
+    var host = el("div", {});
+    q.appendChild(el("div", { class: "row" }, [btn("im-go", "Import", function () {
+      m.className = "msg bad";
+      var text = ta.value.trim();
+      if (!text) { m.textContent = "Paste a backup first."; return; }
+      if (text.length > IMPORT_MAX_CHARS) { m.textContent = "That text is over 20 MB, which is larger than any backup this tool writes."; return; }
+      var parsed, clean;
+      try { parsed = JSON.parse(text); } catch (e) { m.textContent = "That is not valid JSON. Copy the whole backup, from the first { to the last }."; return; }
+      try { clean = FT.sanitizeState(parsed); } catch (e) { m.textContent = "Not imported. " + errText(e); return; }
+      m.textContent = "";
+      host.replaceChildren(confirmBox("Replace everything on this device with this backup (" + clean.docs.length + " documents, " + clean.customers.length + " customers, " + clean.catalog.length + " catalog items)?", "Replace and import", function () {
+        S = clean; saveBlocked = false; ta.value = "";
+        saveNow(); go("docs");
+      }));
+    }, "primary")]));
+    q.appendChild(host);
+    q.appendChild(m);
+    view.appendChild(q);
+  }
+
+  // ------------------------------------------------------------ start
+  function start() {
+    load();
+    Array.prototype.forEach.call(document.querySelectorAll("#nav button"), function (b) {
+      b.addEventListener("click", function () { go(b.getAttribute("data-view")); });
+    });
+    $("btn-start-fresh").addEventListener("click", function () {
+      // When stored data could not be read, Start fresh begins a blank state; say so instead of promising to keep it.
+      $("fresh-confirm-text").textContent = saveBlocked
+        ? "Start with a blank business? The data on this device that could not be read is not loaded; its copy stays in browser storage under \"" + KEY_UNREADABLE + "\"."
+        : "Remove the example business, customers, catalog items, and sample documents? Anything you added yourself stays.";
+      $("fresh-confirm").hidden = false; $("btn-fresh-no").focus();
+    });
+    $("btn-fresh-no").addEventListener("click", function () { $("fresh-confirm").hidden = true; $("btn-start-fresh").focus(); });
+    $("btn-fresh-yes").addEventListener("click", function () {
+      $("fresh-confirm").hidden = true;
+      S = saveBlocked ? FT.blankState() : FT.clearExamples(S);
+      saveBlocked = false;
+      saveNow();
+      go("business");
+    });
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") flush(); });
+    render();
+  }
+  start();
+})();
+</script>
